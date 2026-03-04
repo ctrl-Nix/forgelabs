@@ -34,11 +34,24 @@ Return exactly this JSON:
     )
 
     const data = await res.json()
-    console.log('ZeroDay raw:', JSON.stringify(data))
-
     const text = data.candidates[0].content.parts[0].text
     const clean = text.replace(/```json|```/g, '').trim()
     const result = JSON.parse(clean)
+
+    // Log usage
+    try {
+      const { createClient } = await import('@supabase/supabase-js')
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+      await supabase.from('tool_usage').insert({
+        tool_id: 'zerodayexplainer',
+        timestamp: new Date().toISOString()
+      })
+    } catch (e) {
+      console.log('Logging failed silently')
+    }
 
     return NextResponse.json(result)
 
