@@ -34,12 +34,18 @@ export default function ZeroDayExplainer() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white px-6 py-12">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-[#0a0a0f] text-white">
+      <nav className="border-b border-white/10 px-6 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <a href="/dashboard" className="text-xl font-bold text-white hover:text-blue-400 transition">⚒ ForgeLabs</a>
+          <a href="/dashboard" className="text-sm text-gray-400 hover:text-white transition">← Back to Dashboard</a>
+        </div>
+      </nav>
+
+      <div className="max-w-4xl mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold mb-2">🐛 Zero-Day Explainer</h1>
         <p className="text-gray-400 mb-8">Paste broken code. Get root cause, fix, and prevention tips.</p>
 
-        {/* Input */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
           <select
             value={language}
@@ -76,10 +82,8 @@ export default function ZeroDayExplainer() {
           </button>
         </div>
 
-        {/* Results */}
         {result && (
           <div className="space-y-4">
-            {/* Badges */}
             <div className="flex gap-3">
               <span className={`text-sm px-3 py-1 rounded-full font-medium ${severityColor(result.severity)}`}>
                 Severity: {result.severity}
@@ -89,19 +93,16 @@ export default function ZeroDayExplainer() {
               </span>
             </div>
 
-            {/* Root Cause */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h2 className="text-lg font-semibold mb-3 text-red-400">🔍 Root Cause</h2>
               <p className="text-gray-300">{result.root_cause}</p>
             </div>
 
-            {/* Explanation */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h2 className="text-lg font-semibold mb-3 text-yellow-400">📖 Explanation</h2>
               <p className="text-gray-300">{result.explanation}</p>
             </div>
 
-            {/* Fixed Code */}
             <div className="bg-[#1e1e2e] border border-white/10 rounded-2xl p-6">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="text-lg font-semibold text-green-400">✅ Fixed Code</h2>
@@ -117,7 +118,6 @@ export default function ZeroDayExplainer() {
               </pre>
             </div>
 
-            {/* Prevention */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h2 className="text-lg font-semibold mb-3 text-blue-400">🛡️ Prevention Tip</h2>
               <p className="text-gray-300">{result.prevention_tip}</p>

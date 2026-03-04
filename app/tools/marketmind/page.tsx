@@ -17,23 +17,29 @@ export default function MarketMind() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ idea, audience, monetization })
     })
-   const data = await res.json()
-if (data.error) {
-  alert('Error: ' + data.error)
-  setLoading(false)
-  return
-}
-setResult(data)
+    const data = await res.json()
+    if (data.error) {
+      alert('Error: ' + data.error)
+      setLoading(false)
+      return
+    }
+    setResult(data)
     setLoading(false)
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white px-6 py-12">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-[#0a0a0f] text-white">
+      <nav className="border-b border-white/10 px-6 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <a href="/dashboard" className="text-xl font-bold text-white hover:text-blue-400 transition">⚒ ForgeLabs</a>
+          <a href="/dashboard" className="text-sm text-gray-400 hover:text-white transition">← Back to Dashboard</a>
+        </div>
+      </nav>
+
+      <div className="max-w-4xl mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold mb-2">🧠 MarketMind</h1>
         <p className="text-gray-400 mb-8">AI-powered product research agent</p>
 
-        {/* Input Form */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
           <input
             type="text"
@@ -65,10 +71,8 @@ setResult(data)
           </button>
         </div>
 
-        {/* Results */}
         {result && (
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            {/* Tabs */}
             <div className="flex gap-2 mb-6 flex-wrap">
               {['overview', 'competitors', 'moscow', 'launch'].map(tab => (
                 <button
@@ -81,7 +85,6 @@ setResult(data)
               ))}
             </div>
 
-            {/* Overview Tab */}
             {activeTab === 'overview' && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">Market Overview</h2>
@@ -102,7 +105,6 @@ setResult(data)
               </div>
             )}
 
-            {/* Competitors Tab */}
             {activeTab === 'competitors' && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">Competitor Analysis</h2>
@@ -116,7 +118,6 @@ setResult(data)
               </div>
             )}
 
-            {/* MoSCoW Tab */}
             {activeTab === 'moscow' && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">MoSCoW Feature Prioritisation</h2>
@@ -136,7 +137,6 @@ setResult(data)
               </div>
             )}
 
-            {/* Launch Tab */}
             {activeTab === 'launch' && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">30-Day Launch Plan</h2>
