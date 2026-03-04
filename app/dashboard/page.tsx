@@ -1,4 +1,7 @@
 'use client'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '../lib/supabase'
 import Link from 'next/link'
 
 const tools = [
@@ -32,14 +35,39 @@ const tools = [
 ]
 
 export default function Dashboard() {
+  const router = useRouter()
+  const [checking, setChecking] = useState(true)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) router.push('/login')
+      else setChecking(false)
+    })
+  }, [])
+
+  if (checking) return (
+    <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <p className="text-gray-400">Loading...</p>
+    </main>
+  )
+
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white px-6 py-12">
-      <div className="max-w-5xl mx-auto">
+    <main className="min-h-screen bg-[#0a0a0f] text-white">
+      <nav className="border-b border-white/10 px-6 py-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <span className="text-xl font-bold">⚒ ForgeLabs</span>
+          <div className="flex items-center gap-6">
+            <Link href="/tools/marketmind" className="text-gray-400 hover:text-white text-sm transition">MarketMind</Link>
+            <Link href="/tools/zerodayexplainer" className="text-gray-400 hover:text-white text-sm transition">Zero-Day</Link>
+            <button onClick={async () => { await supabase.auth.signOut(); router.push('/login') }} className="text-sm text-gray-400 hover:text-red-400 transition">Sign Out</button>
+          </div>
+        </div>
+      </nav>
+      <div className="max-w-5xl mx-auto px-6 py-12">
         <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-2">⚒ ForgeLabs</h1>
+          <h1 className="text-4xl font-bold mb-2">Welcome to ForgeLabs</h1>
           <p className="text-gray-400">Your modular AI engineering suite</p>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {tools.map(tool => (
             <Link href={tool.href} key={tool.id}>
