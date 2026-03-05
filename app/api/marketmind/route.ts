@@ -33,7 +33,7 @@ Return exactly this JSON:
     )
 
     const step1Data = await step1Res.json()
-    console.log('Step 1 raw:', JSON.stringify(step1Data))
+    console.log('Step 1 response:', JSON.stringify(step1Data))
     const step1Text = step1Data.candidates[0].content.parts[0].text
     const step1Clean = step1Text.replace(/```json|```/g, '').trim()
     const step1JSON = JSON.parse(step1Clean)
@@ -69,26 +69,24 @@ Return exactly this JSON:
     )
 
     const step2Data = await step2Res.json()
-    console.log('Step 2 raw:', JSON.stringify(step2Data))
+    console.log('Step 2 response:', JSON.stringify(step2Data))
     const step2Text = step2Data.candidates[0].content.parts[0].text
     const step2Clean = step2Text.replace(/```json|```/g, '').trim()
     const step2JSON = JSON.parse(step2Clean)
 
     // Log usage
     try {
-      console.log('Attempting to log...')
       const { createClient } = await import('@supabase/supabase-js')
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       )
-      const { error: logError } = await supabase.from('tool_usage').insert({
+      await supabase.from('tool_usage').insert({
         tool_id: 'marketmind',
         timestamp: new Date().toISOString()
       })
-      console.log('Log result:', logError)
-    } catch (e: any) {
-      console.log('Logging error:', e.message)
+    } catch (e) {
+      console.log('Logging failed silently')
     }
 
     return NextResponse.json({ research: step1JSON, prd: step2JSON })
