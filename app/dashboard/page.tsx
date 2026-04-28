@@ -175,7 +175,7 @@ export default function Dashboard() {
             </div>
           ) : (
             projects.map((project, i) => (
-              <VentureCard key={project.id} project={project} index={i} />
+              <ProjectCard key={project.id} project={project} index={i} />
             ))
           )}
         </div>
@@ -218,7 +218,7 @@ export default function Dashboard() {
   )
 }
 
-function VentureCard({ project, index }: { project: any, index: number }) {
+function ProjectCard({ project, index }: { project: any, index: number }) {
   return (
     <Link href={`/projects/${project.id}`} 
       className="fade-up group relative p-7 rounded-xl bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] hover:border-blue-500/40 transition-all"
