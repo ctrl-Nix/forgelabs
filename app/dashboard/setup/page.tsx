@@ -69,15 +69,15 @@ export default function SetupGuide() {
           </div>
           <h1 className="font-raj font-bold text-5xl mb-4 tracking-tight">Intelligence Engine</h1>
           <p className="text-gray-500 font-mono-j text-xs leading-relaxed max-w-2xl">
-            ForgeOS gives you <strong className="text-white">3 free intelligence runs</strong> on our infrastructure.
-            After that, bring your own Gemini API key to continue for free — forever.
+            This project provides <strong className="text-white">3 initial intelligence runs</strong> on shared infrastructure.
+            For unlimited usage, please provide your own Gemini API key.
           </p>
         </div>
 
         {/* Credit Status Panel */}
         <div className="fade-up mb-12 grid grid-cols-1 md:grid-cols-3 gap-4" style={{ animationDelay: '0.1s' }}>
           <div className="p-6 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-            <div className="font-mono-j text-[9px] text-gray-500 tracking-widest uppercase mb-3">Free Credits</div>
+            <div className="font-mono-j text-[9px] text-gray-500 tracking-widest uppercase mb-3">Initial Runs</div>
             <div className="flex items-end gap-2">
               <span className="font-raj font-bold text-4xl text-blue-400">
                 {credits ? credits.freeCredits.remaining : '—'}
@@ -99,21 +99,21 @@ export default function SetupGuide() {
             <div className="flex items-center gap-3">
               <div className={`w-2.5 h-2.5 rounded-full ${hasKey ? 'bg-emerald-500 animate-pulse' : 'bg-gray-700'}`} />
               <span className="font-raj font-bold text-lg">
-                {hasKey ? 'Connected' : 'Not Set'}
+                {hasKey ? 'Personal Key Active' : 'Not Set'}
               </span>
             </div>
             <p className="font-mono-j text-[9px] text-gray-600 mt-2">
-              {hasKey ? 'Using your personal Gemini key' : 'Using ForgeOS free credits'}
+              {hasKey ? 'Using your personal Gemini key' : 'Using shared initial credits'}
             </p>
           </div>
 
           <div className="p-6 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-            <div className="font-mono-j text-[9px] text-gray-500 tracking-widest uppercase mb-3">Total Runs</div>
+            <div className="font-mono-j text-[9px] text-gray-500 tracking-widest uppercase mb-3">Total Computations</div>
             <span className="font-raj font-bold text-4xl text-white/80">
               {credits ? credits.totalRuns : '—'}
             </span>
             <p className="font-mono-j text-[9px] text-gray-600 mt-2">
-              Tier: <span className="text-blue-400 uppercase">{credits?.tier || 'loading'}</span>
+              Mode: <span className="text-blue-400 uppercase">{credits?.tier === 'byok' ? 'Personal Key' : 'Standard'}</span>
             </p>
           </div>
         </div>
@@ -122,18 +122,16 @@ export default function SetupGuide() {
           {/* Manual */}
           <div className="space-y-8">
             <section>
-              <h2 className="font-raj font-bold text-xl mb-6 text-blue-400 uppercase tracking-wide">How to Get Your Key (Free)</h2>
+              <h2 className="font-raj font-bold text-xl mb-6 text-blue-400 uppercase tracking-wide">Technical Setup</h2>
               <p className="text-gray-400 text-sm leading-relaxed mb-6">
-                Google's Gemini 2.5 Flash is <strong className="text-white">completely free</strong> for individual developers
-                (up to 15 requests/min, 1500/day). Here's how to activate it:
+                ForgeOS utilizes Google's Gemini 2.5 Flash. You can obtain a personal API key for free from Google AI Studio:
               </p>
               <ol className="space-y-5">
                 {[
                   { step: 'Open Google AI Studio', desc: 'Navigate to aistudio.google.com', link: 'https://aistudio.google.com' },
-                  { step: 'Sign In with Google', desc: 'Any standard Gmail account works. No credit card needed.' },
-                  { step: 'Click "Get API Key"', desc: 'Located in the left sidebar. Takes 10 seconds.' },
-                  { step: 'Create a New Key', desc: 'Click "Create API Key" → select any project → copy the key.' },
-                  { step: 'Paste Below', desc: 'Paste the key in the Injection Port on the right. Done.' },
+                  { step: 'Sign In', desc: 'Use any standard Google account.' },
+                  { step: 'Generate API Key', desc: 'Click "Get API Key" in the sidebar.' },
+                  { step: 'Configure', desc: 'Copy the key and paste it into the Injection Port.' },
                 ].map((s, i) => (
                   <li key={i} className="flex gap-5 group">
                     <div className="flex-shrink-0 w-8 h-8 rounded-md bg-blue-500/10 border border-blue-500/20 flex items-center justify-center font-mono-j text-xs text-blue-400 font-bold group-hover:bg-blue-500/20 transition-colors">
@@ -149,21 +147,12 @@ export default function SetupGuide() {
             </section>
 
             <div className="p-5 rounded-lg border border-emerald-500/10 bg-emerald-500/5">
-              <div className="font-mono-j text-[9px] text-emerald-400 tracking-widest uppercase mb-2">Why This is Safe</div>
+              <div className="font-mono-j text-[9px] text-emerald-400 tracking-widest uppercase mb-2">Privacy Notice</div>
               <ul className="text-[11px] text-gray-400 space-y-1.5 leading-relaxed">
-                <li>• Your key is stored <strong className="text-white">only</strong> in your browser's localStorage</li>
-                <li>• It is sent directly to Google's API — we never store or log it</li>
-                <li>• You can revoke it anytime from Google AI Studio</li>
-                <li>• ForgeOS has zero access to your Google account</li>
+                <li>• Your personal key is stored locally in your browser.</li>
+                <li>• It is never saved to our servers or databases.</li>
+                <li>• You can remove the key at any time to clear local storage.</li>
               </ul>
-            </div>
-
-            <div className="p-5 rounded-lg border border-amber-500/10 bg-amber-500/5">
-              <div className="font-mono-j text-[9px] text-amber-400 tracking-widest uppercase mb-2">Without a Key</div>
-              <p className="text-[11px] text-gray-400 leading-relaxed">
-                You get <strong className="text-white">3 free runs</strong> powered by ForgeOS infrastructure. 
-                After that, you'll need to add your own key. No subscriptions, no payments — just a free API key from Google.
-              </p>
             </div>
           </div>
 
@@ -192,28 +181,17 @@ export default function SetupGuide() {
                 <button 
                   onClick={saveKey}
                   className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-sm text-[10px] tracking-[0.2em] uppercase transition-all shadow-lg shadow-blue-900/20">
-                  {saved ? '✓ SAVED SUCCESSFULLY' : hasKey ? 'UPDATE KEY' : 'SAVE TO BROWSER'}
+                  {saved ? '✓ CONFIGURATION UPDATED' : hasKey ? 'UPDATE KEY' : 'SAVE TO BROWSER'}
                 </button>
                 {hasKey && (
                   <button 
                     onClick={clearKey}
                     className="w-full py-3 border border-red-500/20 hover:border-red-500/40 text-red-400/60 hover:text-red-400 font-mono-j text-[9px] rounded transition-all uppercase tracking-widest">
-                    Remove Key & Revert to Free Credits
+                    Remove Key & Use Initial Credits
                   </button>
                 )}
               </div>
             </div>
-
-            {/* Quick Link */}
-            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer"
-              className="block p-6 rounded-xl border border-blue-500/10 hover:border-blue-500/30 bg-blue-500/5 transition-all group text-center">
-              <div className="font-raj font-bold text-lg text-blue-400 group-hover:text-blue-300 transition-colors mb-1">
-                Open Google AI Studio →
-              </div>
-              <div className="font-mono-j text-[9px] text-gray-600">
-                aistudio.google.com/apikey
-              </div>
-            </a>
           </div>
         </div>
       </div>

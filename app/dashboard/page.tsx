@@ -147,16 +147,16 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center gap-3 mb-5">
               <div className="w-6 h-px bg-blue-500/50" />
-              <span className="font-mono-j text-[10px] text-blue-500/60 tracking-[0.35em] uppercase">Venture Control</span>
+              <span className="font-mono-j text-[10px] text-blue-500/60 tracking-[0.35em] uppercase">Project Control</span>
             </div>
             <h1 className="font-raj font-bold text-5xl md:text-6xl tracking-tight leading-none">
-              Your Ventures
+              Your Projects
             </h1>
           </div>
           
           <Link href="/dashboard/new" 
             className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-sm text-[10px] tracking-[0.22em] uppercase transition-all shadow-lg shadow-blue-900/20">
-            + Start New Venture
+            + Create New Project
           </Link>
         </div>
 
@@ -168,9 +168,9 @@ export default function Dashboard() {
              ))
           ) : projects.length === 0 ? (
             <div className="col-span-full py-20 text-center border border-dashed border-white/10 rounded-xl bg-white/[0.01]">
-               <p className="font-mono-j text-[10px] text-gray-600 tracking-widest uppercase mb-4">No active ventures found.</p>
+               <p className="font-mono-j text-[10px] text-gray-600 tracking-widest uppercase mb-4">No active projects found.</p>
                <Link href="/dashboard/new" className="text-blue-400 font-mono-j text-[10px] tracking-widest uppercase hover:text-blue-300">
-                  Begin Inception Sequence →
+                  Begin Initial Sequence →
                </Link>
             </div>
           ) : (
