@@ -1,7 +1,15 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+import { useSearchParams } from 'next/navigation'
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
+import { supabase } from '../../lib/supabase'
 
 export default function MarketMind() {
+  const searchParams = useSearchParams()
+  const projectId = searchParams.get('projectId')
+  
   const [idea, setIdea] = useState('')
   const [audience, setAudience] = useState('')
   const [monetization, setMonetization] = useState('')
@@ -9,23 +17,99 @@ export default function MarketMind() {
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('overview')
 
+  useEffect(() => {
+    if (projectId) {
+      supabase.from('projects').select('*').eq('id', projectId).single()
+        .then(({ data }) => {
+          if (data) {
+            setIdea(data.name)
+            setAudience(data.description.slice(0, 50) + '...')
+          }
+        })
+    }
+  }, [projectId])
+
+  const [creditError, setCreditError] = useState<any>(null)
+
   const handleSubmit = async () => {
+    if (!idea || !audience || !monetization) return
     setLoading(true)
     setResult(null)
-    const res = await fetch('/api/marketmind', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idea, audience, monetization })
-    })
-    const data = await res.json()
-    if (data.error) {
-      alert('Error: ' + data.error)
+    setCreditError(null)
+    try {
+      const userKey = localStorage.getItem('FORGE_USER_API_KEY')
+      const res = await fetch('/api/marketmind', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-key': userKey || '' 
+        },
+        body: JSON.stringify({ idea, audience, monetization, projectId })
+      })
+
+      const data = await res.json()
+      if (res.status === 429 && data.needsKey) {
+        setCreditError(data)
+        return
+      }
+      if (data.error) {
+        alert('Error: ' + data.error)
+        return
+      }
+      setResult(data)
+    } catch (err) {
+      alert('Failed to run pipeline')
+    } finally {
       setLoading(false)
-      return
     }
-    setResult(data)
-    setLoading(false)
   }
+
+
+  const copyToClipboard = () => {
+    if (!result) return
+    const text = JSON.stringify(result.prd, null, 2)
+    navigator.clipboard.writeText(text)
+    alert('PRD copied to clipboard!')
+  }
+
+  const downloadPDF = () => {
+    if (!result) return
+    const doc = new jsPDF()
+    
+    doc.setFontSize(22)
+    doc.text('ForgeLabs Market Research Report', 20, 20)
+    
+    doc.setFontSize(14)
+    doc.text(`Idea: ${idea}`, 20, 35)
+    doc.text(`Audience: ${audience}`, 20, 45)
+    doc.text(`Monetization: ${monetization}`, 20, 55)
+    
+    doc.setFontSize(16)
+    doc.text('Market Summary', 20, 75)
+    doc.setFontSize(10)
+    const splitSummary = doc.splitTextToSize(result.research.market_summary, 170)
+    doc.text(splitSummary, 20, 85)
+    
+    doc.addPage()
+    doc.setFontSize(16)
+    doc.text('MoSCoW Prioritization', 20, 20)
+    
+    let y = 30
+    Object.entries(result.prd.moscow).forEach(([key, items]: [string, any]) => {
+      doc.setFontSize(12)
+      doc.text(key.toUpperCase().replace('_', ' '), 20, y)
+      y += 7
+      doc.setFontSize(10)
+      items.forEach((item: string) => {
+        doc.text(`- ${item}`, 25, y)
+        y += 5
+      })
+      y += 5
+    })
+    
+    doc.save(`ForgeLabs_${idea.replace(/\s+/g, '_')}.pdf`)
+  }
+
 
   const tabs = [
     { id: 'overview', label: 'OVERVIEW' },
@@ -180,7 +264,41 @@ export default function MarketMind() {
           </div>
         </div>
 
+        {/* Credit Exhausted Banner */}
+        {creditError && (
+          <div className="fade-up mb-8">
+            <div className="relative rounded-xl overflow-hidden"
+              style={{ border: '1px solid rgba(251,146,60,0.3)', background: 'rgba(251,146,60,0.05)' }}>
+              <div className="h-px w-full"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(251,146,60,0.7), transparent)' }} />
+              <div className="p-8 text-center">
+                <div className="font-mono-j text-[9px] text-amber-400/60 tracking-[0.3em] uppercase mb-4">
+                  FREE CREDITS EXHAUSTED
+                </div>
+                <h3 className="font-raj font-bold text-2xl mb-3 text-amber-400">
+                  {creditError.creditsUsed}/{creditError.creditsTotal} Intelligence Runs Used
+                </h3>
+                <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                  You've experienced ForgeOS at full power. To continue generating unlimited market intelligence, 
+                  add your own free Gemini API key.
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <a href="/dashboard/setup" 
+                    className="px-8 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-sm text-[10px] tracking-[0.2em] uppercase transition-all shadow-lg shadow-amber-900/20">
+                    Configure API Key (Free)
+                  </a>
+                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer"
+                    className="px-8 py-3 border border-amber-500/30 hover:border-amber-500/60 text-amber-400 font-bold rounded-sm text-[10px] tracking-[0.2em] uppercase transition-all">
+                    Get Key from Google →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Results */}
+
         {result && (
           <div className="fade-up">
             <div className="relative rounded-xl overflow-hidden"
@@ -201,20 +319,34 @@ export default function MarketMind() {
                 <p className="font-mono-j text-[9px] text-blue-400/60 tracking-[0.3em] uppercase mb-5">// RESEARCH OUTPUT</p>
 
                 {/* Tabs */}
-                <div className="flex gap-1 mb-7 p-1 rounded-lg w-fit"
-                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  {tabs.map(tab => (
-                    <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                      className="px-4 py-2 rounded-md font-mono-j text-[9px] tracking-[0.15em] transition-all duration-200"
-                      style={{
-                        background: activeTab === tab.id ? 'rgba(59,130,246,0.25)' : 'transparent',
-                        color: activeTab === tab.id ? '#93c5fd' : '#6b7280',
-                        border: activeTab === tab.id ? '1px solid rgba(59,130,246,0.4)' : '1px solid transparent',
-                      }}>
-                      {tab.label}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7">
+                  <div className="flex gap-1 p-1 rounded-lg w-fit"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    {tabs.map(tab => (
+                      <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                        className="px-4 py-2 rounded-md font-mono-j text-[9px] tracking-[0.15em] transition-all duration-200"
+                        style={{
+                          background: activeTab === tab.id ? 'rgba(59,130,246,0.25)' : 'transparent',
+                          color: activeTab === tab.id ? '#93c5fd' : '#6b7280',
+                          border: activeTab === tab.id ? '1px solid rgba(59,130,246,0.4)' : '1px solid transparent',
+                        }}>
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button onClick={copyToClipboard}
+                      className="px-4 py-2 rounded-md font-mono-j text-[9px] tracking-[0.15em] border border-white/10 text-gray-400 hover:text-white hover:border-white/20 transition-all">
+                      COPY JSON
                     </button>
-                  ))}
+                    <button onClick={downloadPDF}
+                      className="px-4 py-2 rounded-md font-mono-j text-[9px] tracking-[0.15em] bg-blue-600 text-white hover:bg-blue-500 transition-all">
+                      DOWNLOAD PDF
+                    </button>
+                  </div>
                 </div>
+
 
                 {/* Overview */}
                 {activeTab === 'overview' && (

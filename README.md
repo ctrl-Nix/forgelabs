@@ -1,169 +1,125 @@
-# ⚒ ForgeLabs
+# ⚒ ForgeOS — The Venture Suite
 
-> **Modular AI Product Engineering Suite** — built for early-stage product teams who need structured, actionable intelligence fast.
+> **The Startup Operating System** — A professional-grade engineering platform for transforming ideas into venture-ready products.
 
-**Live Demo:** [forgelabs-rosy.vercel.app](https://forgelabs-rosy.vercel.app)  
 **GitHub:** [github.com/ctrl-Nix/forgelabs](https://github.com/ctrl-Nix/forgelabs)
 
 ---
 
-## What is ForgeLabs?
+## What is ForgeOS?
 
-ForgeLabs is a modular AI engineering suite with two live tools and one in development. Each module is an independent AI agent that takes structured input and returns structured, production-grade output — not vague summaries, but actual deliverables you can act on.
+ForgeOS is more than an AI tool; it is a **Project-Centric Startup OS**. It shifts the focus from standalone utilities to a longitudinal "Venture Sequence." 
 
-The core thesis: most "AI wrappers" are just chat interfaces around a model. ForgeLabs is different. Every tool uses a **multi-step pipeline** with typed outputs, domain-specific prompting, and schema-validated JSON — so the output is consistent, usable, and defensible.
-
----
-
-## Modules
-
-### 🧠 MarketMind — Product Research Agent
-**Status: Live**
-
-Input a SaaS idea, target audience, and monetization model. Get a full product research report in under 30 seconds.
-
-**How it works (2-step pipeline):**
-- **Step 1 — Market Research:** Gemini analyzes competitors, identifies the market gap, builds target personas, and surfaces risks with severity scores
-- **Step 2 — PRD Generation:** A second Gemini call takes the Step 1 output and generates a full Product Requirements Document with MoSCoW prioritization, MVP scope, monetization strategy, 30-day launch plan, and tech complexity score
-
-**Why two API calls?** Separating research from PRD generation keeps each prompt focused and domain-specific. A single prompt trying to do both produces shallow output. Two specialized prompts produce output you'd actually use in a team standup.
-
-**Output tabs:** Overview · Competitors · MoSCoW Features · Launch Plan
+Instead of running disconnected prompts, users initialize a **Venture**, which acts as a central hub for all market research, PRDs, bug analysis, and future engineering tasks.
 
 ---
 
-### 🐛 Zero-Day Explainer — Bug Analysis Agent
-**Status: Live**
+## 🚀 The Launch Sequence
 
-Paste broken code and an error message. Get a structured engineering report instantly.
+### 1. Inception — MarketMind
+**Product Research Agent**  
+Generate a full market research report and a professional MoSCoW PRD in under 30 seconds.
+- **Thinking Intelligence**: Powered by Gemini 2.5 Flash with reasoning capabilities.
+- **2-Step Pipeline**: Separates competitive research from product definition for maximum precision.
+- **Project Context**: Automatically associates outputs with your active Venture.
 
-**Supports:** JavaScript · TypeScript · Python · Go · Rust · Java · C++ · CSS
+### 2. Engineering — Zero-Day Explainer
+**Bug Analysis & Resolution Agent**  
+Instantly diagnose complex runtime errors and generate production-ready fixes.
+- **Multi-Language Support**: JS, TS, Python, Go, Rust, Java, C++, CSS.
+- **Confidence Scoring**: Surfaces AI uncertainty to ensure responsible engineering.
+- **Root Cause Analysis**: Explains the *why* so your team learns while fixing.
 
-**Output fields:**
-- `root_cause` — exactly what went wrong and why
-- `explanation` — plain-English breakdown for junior devs
-- `corrected_code` — fixed, copy-ready code
-- `prevention_tip` — how to avoid this class of bug in future
-- `severity` — Critical / High / Medium / Low
-- `confidence` — High / Medium / Low (AI surfaces its own uncertainty)
-
-**Why confidence score?** AI isn't always right. Surfacing uncertainty is responsible engineering — it tells the developer when to double-check rather than blindly trust the output.
-
----
-
-### 🚀 EngageOS — User Engagement Suite
-**Status: Waitlist**
-
-AI-powered user engagement and retention suite. Behavioral triggers, smart nudges, and lifecycle automation. Coming soon.
+### 3. Growth — EngageOS
+**Lifecycle Automation (Waitlist)**  
+AI-powered engagement suite for behavioral triggers and smart nudges.
 
 ---
 
-## Architecture
+## 💰 The Freemium Intelligence Model
+
+ForgeOS implements a unique **"Bring Your Own Key" (BYOK)** economy to ensure zero-marginal-cost scaling:
+- **The Hook**: Every user gets **3 FREE runs** on the house to experience the system's power.
+- **The Bridge**: After the free tier, users plug in their own **Gemini API Key** (available for free from Google AI Studio).
+- **Infinite Runway**: This model allows the platform to scale to millions of users with zero increase in AI computation costs for the owner.
+
+---
+
+## 🛠 Architecture
 
 ```
 forgelabs/
 ├── app/
 │   ├── api/
-│   │   ├── marketmind/route.ts       # 2-step Gemini pipeline
-│   │   └── zerodayexplainer/route.ts # Single-step analysis
-│   ├── dashboard/page.tsx            # Auth-protected tool registry
-│   ├── login/page.tsx                # Supabase email auth
-│   ├── tools/
-│   │   ├── marketmind/page.tsx
-│   │   └── zerodayexplainer/page.tsx
-│   ├── waitlist/page.tsx
-│   └── page.tsx                      # Landing page
-├── .env.local                        # API keys (gitignored)
-└── package.json
+│   │   ├── credits/        # Live credit tracking
+│   │   ├── marketmind/     # AI research pipeline
+│   │   ├── projects/       # Venture management
+│   │   └── zerodayexplainer/
+│   ├── dashboard/          # Venture Control Center
+│   ├── projects/           # Venture Profile pages
+│   ├── tools/              # Module interfaces
+│   ├── lib/
+│   │   ├── credits.ts      # Freemium logic core
+│   │   └── schemas.ts      # Zod validation layer
+│   └── page.tsx            # Landing page
 ```
 
-**Stack:**
-- **Frontend:** Next.js 14 (App Router) + TypeScript + Tailwind CSS
-- **Auth:** Supabase Auth (email/password)
-- **Database:** Supabase PostgreSQL (usage logging, waitlist)
-- **AI:** Google Gemini 2.5 Flash via REST API
-- **Deployment:** Vercel (auto-deploy on push)
-
 ---
 
-## Technical Decisions
+## ⚙️ Local Setup
 
-| Decision | Why |
-|---|---|
-| Next.js API routes | API keys never exposed to client — all Gemini calls happen server-side |
-| Two-step pipeline in MarketMind | Focused prompts outperform monolithic prompts for structured output |
-| Temperature 0.3 for research | Balance between creativity and consistency |
-| Temperature 0.2 for debugging | Precision matters more than creativity for code analysis |
-| Zod-ready route structure | Schema validation ready to add without refactoring |
-| Supabase over Firebase | Postgres gives structured querying for usage analytics |
-| Tool Registry pattern | Demonstrates scalable architecture — adding a new tool is one object in an array |
-
----
-
-## Key Engineering Patterns
-
-**Tool Registry Pattern** — Dashboard renders from a typed `tools[]` array. Adding a new module requires zero UI changes — just add an entry to the registry. This is how real product teams scale internal tooling.
-
-**Multi-step AI Pipeline** — MarketMind's two-stage approach mirrors how senior PMs actually work: research first, synthesis second. Each stage gets a focused, domain-specific prompt with explicit JSON schema instructions.
-
-**Silent Failure Logging** — Usage tracking is wrapped in a try/catch that never surfaces errors to the user. Analytics should never break the product.
-
-**Confidence Surfacing** — Zero-Day Explainer returns a `confidence` field with every analysis. This is intentional — responsible AI engineering means the tool should tell you when it's unsure.
-
----
-
-## Local Setup
-
+1. **Clone & Install**
 ```bash
 git clone https://github.com/ctrl-Nix/forgelabs
 cd forgelabs
 npm install
 ```
 
+2. **Configure Environment**
 Create `.env.local`:
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-GEMINI_API_KEY=your_gemini_api_key
-```
-
 ```bash
-npm run dev
-# Open http://localhost:3000
+NEXT_PUBLIC_SUPABASE_URL=your_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+GEMINI_API_KEY=your_key
 ```
 
-**Supabase setup** — run this in your Supabase SQL editor:
+3. **Database Setup**
+Run the following in your Supabase SQL Editor:
+
 ```sql
+-- Venture Management
+create table projects (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id),
+  name text not null,
+  description text,
+  status text default 'inception',
+  created_at timestamptz default now()
+);
+
+-- Advanced Usage Tracking
 create table tool_usage (
   id uuid default gen_random_uuid() primary key,
   user_id text,
   tool_id text,
+  project_id uuid references projects(id),
+  key_source text default 'server',
+  data jsonb,
   timestamp timestamptz default now()
 );
 
-create table waitlist (
-  id uuid default gen_random_uuid() primary key,
-  email text unique,
-  tool_interest text,
-  created_at timestamptz default now()
-);
-
-alter table tool_usage disable row level security;
-alter table waitlist disable row level security;
+alter table projects enable row level security;
+alter table tool_usage enable row level security;
 ```
 
 ---
 
-## What's Next
-
-- [ ] Rate limiting (10 uses/day per user)
-- [ ] Save past researches to Supabase
-- [ ] Export PRD as PDF
-- [ ] EngageOS module
-- [ ] Zod schema validation on all API routes
-- [ ] Usage analytics dashboard
+## 👔 Strategic Roadmap
+- [x] **Phase 1**: Pivot to Project-Centric Architecture (Venture Suite)
+- [x] **Phase 2**: Implement BYOK Freemium Model
+- [x] **Phase 3**: Upgrade to Gemini 2.5 Flash (Thinking Intelligence)
+- [ ] **Phase 4**: Linear/GitHub Integration for automated task creation
+- [ ] **Phase 5**: BrandArchitect — Visual Identity generation for Ventures
 
 ---
-
-
-
+*Built with precision for the next generation of founders.*

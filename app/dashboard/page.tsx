@@ -58,17 +58,36 @@ const tools = [
   },
 ]
 
+
 export default function Dashboard() {
   const router = useRouter()
   const [checking, setChecking] = useState(true)
   const [hovered, setHovered] = useState<string | null>(null)
+  const [projects, setProjects] = useState<any[]>([])
+  const [loadingProjects, setLoadingProjects] = useState(true)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) router.push('/login')
-      else setChecking(false)
+      if (!session) {
+        router.push('/login')
+      } else {
+        setChecking(false)
+        fetchProjects()
+      }
     })
   }, [])
+
+  const fetchProjects = async () => {
+    try {
+      const res = await fetch('/api/projects')
+      const data = await res.json()
+      if (!data.error) setProjects(data)
+    } catch (e) {
+      console.error('Failed to fetch projects')
+    } finally {
+      setLoadingProjects(false)
+    }
+  }
 
   if (checking) return (
     <main className="min-h-screen bg-[#050508] flex items-center justify-center">
@@ -92,17 +111,7 @@ export default function Dashboard() {
           to { opacity: 1; transform: translateY(0); }
         }
         .fade-up { animation: fadeUp 0.4s ease forwards; opacity: 0; }
-        @keyframes scanMove {
-          0% { top: 0%; opacity: 0.6; }
-          100% { top: 100%; opacity: 0; }
-        }
-        .scan-line {
-          position: absolute;
-          left: 0; right: 0;
-          height: 1px;
-          pointer-events: none;
-          animation: scanMove 2s linear infinite;
-        }
+        .venture-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
       `}</style>
 
       {/* Background grid */}
@@ -111,27 +120,18 @@ export default function Dashboard() {
         backgroundSize: '48px 48px'
       }} />
 
-      {/* Top ambient */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[900px] h-[200px] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, rgba(59,130,246,0.05) 0%, transparent 70%)' }} />
-
       {/* Navbar */}
       <nav className="relative z-20 border-b border-white/[0.04] px-8 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <Link href="/" className="font-raj font-bold text-lg tracking-[0.15em] text-white hover:text-blue-400 transition-colors duration-200 uppercase">
-            ⚒ ForgeLabs
+            ⚒ ForgeOS
           </Link>
           <div className="flex items-center gap-8">
-            {[
-              { label: 'MarketMind', href: '/tools/marketmind' },
-              { label: 'Zero-Day', href: '/tools/zerodayexplainer' },
-            ].map(item => (
-              <Link key={item.label} href={item.href}
-                className="font-mono-j text-[10px] text-gray-600 hover:text-white transition-colors duration-200 tracking-[0.15em] uppercase">
-                {item.label}
-              </Link>
-            ))}
-            <button
+             <Link href="/dashboard/setup" className="font-mono-j text-[10px] text-blue-500/60 hover:text-blue-400 transition-colors duration-200 tracking-[0.15em] uppercase font-bold">
+               Config AI
+             </Link>
+             <button
+
               onClick={async () => { await supabase.auth.signOut(); router.push('/login') }}
               className="font-mono-j text-[10px] text-gray-600 hover:text-red-400 transition-colors duration-200 tracking-[0.15em] uppercase">
               Sign Out
@@ -142,151 +142,177 @@ export default function Dashboard() {
 
       <div className="relative z-10 max-w-6xl mx-auto px-8 py-14">
 
-        {/* Header with description */}
-        <div className="mb-14 fade-up" style={{ animationDelay: '0.05s' }}>
-          <div className="flex items-center gap-3 mb-5">
-            <div className="w-6 h-px bg-blue-500/50" />
-            <span className="font-mono-j text-[10px] text-blue-500/60 tracking-[0.35em] uppercase">Command Center</span>
+        {/* Header */}
+        <div className="mb-14 fade-up flex justify-between items-end">
+          <div>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-6 h-px bg-blue-500/50" />
+              <span className="font-mono-j text-[10px] text-blue-500/60 tracking-[0.35em] uppercase">Venture Control</span>
+            </div>
+            <h1 className="font-raj font-bold text-5xl md:text-6xl tracking-tight leading-none">
+              Your Ventures
+            </h1>
           </div>
-          <h1 className="font-raj font-bold text-5xl md:text-6xl tracking-tight leading-none mb-5">
-            Select Your Module
-          </h1>
-          {/* Description block */}
-          <div className="max-w-2xl border-l-2 border-blue-500/20 pl-5 space-y-1.5">
-            <p className="font-mono-j text-xs text-gray-500 tracking-wide leading-relaxed">
-              ForgeLabs is a modular AI engineering suite built for early-stage product teams.
-            </p>
-            <p className="font-mono-j text-xs text-gray-600 tracking-wide leading-relaxed">
-              Each module is an independent AI agent — plug in your idea, get structured, actionable output.
-            </p>
-            <p className="font-mono-j text-xs text-gray-700 tracking-wide leading-relaxed">
-              No fluff. No hallucinations dressed as insight. Just engineered outputs.
-            </p>
-          </div>
-          <p className="font-mono-j text-xs text-gray-700 tracking-[0.1em] mt-5">
-            3 modules · 2 operational · 1 incoming
-          </p>
+          
+          <Link href="/dashboard/new" 
+            className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-sm text-[10px] tracking-[0.22em] uppercase transition-all shadow-lg shadow-blue-900/20">
+            + Start New Venture
+          </Link>
         </div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
-          {tools.map((tool, i) => {
-            const isHovered = hovered === tool.id
-            return (
-              <Link href={tool.href} key={tool.id}
-                onMouseEnter={() => setHovered(tool.id)}
-                onMouseLeave={() => setHovered(null)}
-                className="fade-up block"
-                style={{ animationDelay: `${0.1 + i * 0.08}s` }}
-              >
-                <div className="relative h-full rounded-lg overflow-hidden"
-                  style={{
-                    border: `1px solid ${isHovered ? `rgba(${tool.accentRgb},0.5)` : 'rgba(255,255,255,0.06)'}`,
-                    background: isHovered
-                      ? `linear-gradient(145deg, rgba(${tool.accentRgb},0.08) 0%, #050508 100%)`
-                      : 'rgba(255,255,255,0.02)',
-                    boxShadow: isHovered
-                      ? `0 0 30px rgba(${tool.accentRgb},0.15), 0 0 60px rgba(${tool.accentRgb},0.08), 0 0 100px rgba(${tool.accentRgb},0.04), inset 0 0 30px rgba(${tool.accentRgb},0.04)`
-                      : 'none',
-                    transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
-                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  }}>
+        {/* Project List */}
+        <div className="venture-grid mb-14">
+          {loadingProjects ? (
+             [1,2,3].map(i => (
+               <div key={i} className="h-48 rounded-lg bg-white/[0.02] border border-white/[0.04] animate-pulse" />
+             ))
+          ) : projects.length === 0 ? (
+            <div className="col-span-full py-20 text-center border border-dashed border-white/10 rounded-xl bg-white/[0.01]">
+               <p className="font-mono-j text-[10px] text-gray-600 tracking-widest uppercase mb-4">No active ventures found.</p>
+               <Link href="/dashboard/new" className="text-blue-400 font-mono-j text-[10px] tracking-widest uppercase hover:text-blue-300">
+                  Begin Inception Sequence →
+               </Link>
+            </div>
+          ) : (
+            projects.map((project, i) => (
+              <VentureCard key={project.id} project={project} index={i} />
+            ))
+          )}
+        </div>
 
-                  {/* Scanline effect on hover */}
-                  {isHovered && (
-                    <div className="scan-line"
-                      style={{ background: `linear-gradient(90deg, transparent, rgba(${tool.accentRgb},0.4), transparent)` }} />
-                  )}
+        <div className="mb-8">
+           <h2 className="font-raj font-bold text-2xl tracking-wide mb-6">Standard Modules</h2>
+           {/* Tool cards from original dashboard, but smaller/integrated */}
+        </div>
 
-                  {/* Top glow line */}
-                  <div className="absolute top-0 left-0 right-0 h-px transition-all duration-300"
-                    style={{
-                      background: isHovered
-                        ? `linear-gradient(90deg, transparent, rgba(${tool.accentRgb},1), transparent)`
-                        : 'transparent',
-                      boxShadow: isHovered ? `0 0 10px rgba(${tool.accentRgb},1), 0 0 20px rgba(${tool.accentRgb},0.5)` : 'none',
-                    }} />
-
-                  {/* Corner accents */}
-                  <div className="absolute top-3 left-3 w-3 h-3 transition-all duration-300"
-                    style={{
-                      borderTop: `1px solid ${isHovered ? `rgba(${tool.accentRgb},0.8)` : 'rgba(255,255,255,0.08)'}`,
-                      borderLeft: `1px solid ${isHovered ? `rgba(${tool.accentRgb},0.8)` : 'rgba(255,255,255,0.08)'}`,
-                    }} />
-                  <div className="absolute bottom-3 right-3 w-3 h-3 transition-all duration-300"
-                    style={{
-                      borderBottom: `1px solid ${isHovered ? `rgba(${tool.accentRgb},0.8)` : 'rgba(255,255,255,0.08)'}`,
-                      borderRight: `1px solid ${isHovered ? `rgba(${tool.accentRgb},0.8)` : 'rgba(255,255,255,0.08)'}`,
-                    }} />
-
-                  <div className="p-7">
-                    {/* Icon + status */}
-                    <div className="flex items-start justify-between mb-7">
-                      <div className="p-2.5 rounded-md transition-all duration-300"
-                        style={{
-                          background: isHovered ? `rgba(${tool.accentRgb},0.12)` : 'rgba(255,255,255,0.04)',
-                          color: isHovered ? tool.accent : '#374151',
-                          border: `1px solid ${isHovered ? `rgba(${tool.accentRgb},0.3)` : 'rgba(255,255,255,0.06)'}`,
-                          boxShadow: isHovered ? `0 0 15px rgba(${tool.accentRgb},0.25)` : 'none',
-                        }}>
-                        {tool.icon}
-                      </div>
-                      <span className="font-mono-j text-[9px] px-2.5 py-1 rounded-sm tracking-[0.15em]"
-                        style={{
-                          color: tool.status === 'live' ? '#10b981' : '#8b5cf6',
-                          background: tool.status === 'live' ? 'rgba(16,185,129,0.07)' : 'rgba(139,92,246,0.07)',
-                          border: `1px solid ${tool.status === 'live' ? 'rgba(16,185,129,0.2)' : 'rgba(139,92,246,0.2)'}`,
-                        }}>
-                        {tool.status === 'live' ? '● LIVE' : '○ SOON'}
-                      </span>
-                    </div>
-
-                    {/* Name */}
-                    <h2 className="font-raj font-bold text-2xl mb-3 tracking-wide transition-colors duration-300"
-                      style={{ color: isHovered ? tool.accent : 'white' }}>
-                      {tool.name}
-                    </h2>
-
-                    {/* Description */}
-                    <p className="text-gray-500 text-sm leading-relaxed mb-8 font-light">
-                      {tool.description}
-                    </p>
-
-                    {/* Footer */}
-                    <div className="flex items-center justify-between pt-4 border-t border-white/[0.04]">
-                      <span className="font-mono-j text-[9px] text-gray-700 tracking-[0.2em] uppercase">
-                        {tool.category}
-                      </span>
-                      <span className="font-mono-j text-[9px] tracking-[0.15em] transition-colors duration-300"
-                        style={{ color: isHovered ? tool.accent : '#1f2937' }}>
-                        {tool.tag} →
-                      </span>
-                    </div>
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-14">
+          {tools.filter(t => t.status === 'live').map((tool, i) => (
+             <Link href={tool.href} key={tool.id}
+               className="group relative p-6 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:border-blue-500/30 transition-all">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-blue-400">{tool.icon}</div>
+                  <span className="font-mono-j text-[8px] text-gray-700 tracking-widest uppercase">{tool.tag}</span>
                 </div>
-              </Link>
-            )
-          })}
+                <h3 className="font-raj font-bold text-lg mb-2">{tool.name}</h3>
+                <p className="text-gray-500 text-xs mb-4 line-clamp-2">{tool.description}</p>
+                <div className="font-mono-j text-[8px] text-blue-500/50 group-hover:text-blue-400 transition-colors">LAUNCH MODULE →</div>
+             </Link>
+          ))}
         </div>
 
-        {/* Stats bar */}
-        <div className="fade-up border border-white/[0.04] rounded-lg overflow-hidden"
-          style={{ animationDelay: '0.4s' }}>
-          <div className="flex divide-x divide-white/[0.04]">
-            {[
-              { label: 'TOOLS LIVE', value: '02' },
-              { label: 'AI PIPELINE', value: '2-STEP' },
-              { label: 'LANGUAGES', value: '08' },
-              { label: 'MODULES INCOMING', value: '01' },
-            ].map(s => (
-              <div key={s.label} className="flex-1 text-center py-5 px-4 hover:bg-white/[0.02] transition-colors duration-200">
-                <div className="font-raj font-bold text-2xl text-blue-400 mb-1 tabular-nums">{s.value}</div>
-                <div className="font-mono-j text-[9px] text-gray-700 tracking-[0.2em]">{s.label}</div>
-              </div>
-            ))}
+        {/* Recent Activities */}
+        <div className="fade-up mt-12" style={{ animationDelay: '0.5s' }}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-raj font-bold text-2xl tracking-wide">Recent System Events</h2>
+            <Link href="/dashboard/history" className="font-mono-j text-[9px] text-blue-500/60 hover:text-blue-400 tracking-[0.2em] uppercase transition-colors">
+              Audit Logs →
+            </Link>
+          </div>
+
+          <div className="border border-white/[0.04] rounded-lg overflow-hidden bg-white/[0.01]">
+            <RecentActivities />
           </div>
         </div>
       </div>
     </main>
   )
 }
+
+function VentureCard({ project, index }: { project: any, index: number }) {
+  return (
+    <Link href={`/projects/${project.id}`} 
+      className="fade-up group relative p-7 rounded-xl bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.06] hover:border-blue-500/40 transition-all"
+      style={{ animationDelay: `${0.2 + index * 0.1}s` }}>
+      
+      <div className="absolute top-0 right-0 p-4">
+         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+      </div>
+
+      <div className="mb-6">
+        <div className="font-mono-j text-[8px] text-blue-500/60 tracking-[0.3em] uppercase mb-2">PHASE: {project.status?.toUpperCase() || 'INCEPTION'}</div>
+        <h3 className="font-raj font-bold text-2xl text-white group-hover:text-blue-400 transition-colors">{project.name}</h3>
+      </div>
+      
+      <p className="text-gray-500 text-xs mb-8 line-clamp-2 font-mono-j">{project.description}</p>
+      
+      <div className="flex items-center justify-between pt-5 border-t border-white/[0.04]">
+         <div className="flex -space-x-2">
+            {[1,2].map(i => <div key={i} className="w-5 h-5 rounded-full border border-[#050508] bg-gray-800" />)}
+         </div>
+         <span className="font-mono-j text-[9px] text-gray-700 group-hover:text-white transition-colors">ENTER COMMAND →</span>
+      </div>
+    </Link>
+  )
+}
+
+function RecentActivities() {
+
+  const [activities, setActivities] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      const { data, error } = await supabase
+        .from('tool_usage')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('timestamp', { ascending: false })
+        .limit(5)
+
+      if (error) console.error('Error fetching activities:', error)
+      else setActivities(data || [])
+      setLoading(false)
+    }
+
+    fetchActivities()
+  }, [])
+
+  if (loading) return (
+    <div className="p-8 text-center font-mono-j text-[10px] text-gray-700 tracking-widest uppercase">
+      Scanning database...
+    </div>
+  )
+
+  if (activities.length === 0) return (
+    <div className="p-8 text-center font-mono-j text-[10px] text-gray-700 tracking-widest uppercase">
+      No recent activity recorded.
+    </div>
+  )
+
+  return (
+    <div className="divide-y divide-white/[0.04]">
+      {activities.map((act) => (
+        <div key={act.id} className="p-5 flex items-center justify-between hover:bg-white/[0.02] transition-colors group">
+          <div className="flex items-center gap-4">
+            <div className={`p-2 rounded-md ${act.tool_id === 'marketmind' ? 'bg-blue-500/10 text-blue-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+              {act.tool_id === 'marketmind' ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              )}
+            </div>
+            <div>
+              <div className="font-raj font-bold text-sm tracking-wide text-white/90">
+                {act.tool_id === 'marketmind' ? 'MarketMind Research' : 'Zero-Day Bug Analysis'}
+              </div>
+              <div className="font-mono-j text-[9px] text-gray-600 tracking-wider">
+                {new Date(act.timestamp).toLocaleString()}
+              </div>
+            </div>
+          </div>
+          <Link href={`/tools/${act.tool_id}`} 
+            className="font-mono-j text-[9px] text-gray-700 group-hover:text-white transition-colors tracking-widest">
+            VIEW DETAILS →
+          </Link>
+        </div>
+      ))}
+    </div>
+  )
+}

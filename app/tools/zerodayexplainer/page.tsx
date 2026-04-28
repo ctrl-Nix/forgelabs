@@ -8,15 +8,28 @@ export default function ZeroDayExplainer() {
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
 
+  const [creditError, setCreditError] = useState<any>(null)
+
   const handleSubmit = async () => {
     setLoading(true)
     setResult(null)
+    setCreditError(null)
+    const userKey = localStorage.getItem('FORGE_USER_API_KEY')
     const res = await fetch('/api/zerodayexplainer', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-user-key': userKey || '' 
+      },
       body: JSON.stringify({ code, error, language })
     })
+
     const data = await res.json()
+    if (res.status === 429 && data.needsKey) {
+      setCreditError(data)
+      setLoading(false)
+      return
+    }
     if (data.error) {
       alert('Error: ' + data.error)
       setLoading(false)
@@ -25,6 +38,7 @@ export default function ZeroDayExplainer() {
     setResult(data)
     setLoading(false)
   }
+
 
   const severityConfig: any = {
     Critical: { color: '#f87171', rgb: '248,113,113' },
@@ -224,8 +238,42 @@ export default function ZeroDayExplainer() {
           </div>
         </div>
 
+        {/* Credit Exhausted Banner */}
+        {creditError && (
+          <div className="fade-up mb-8">
+            <div className="relative rounded-xl overflow-hidden"
+              style={{ border: '1px solid rgba(251,146,60,0.3)', background: 'rgba(251,146,60,0.05)' }}>
+              <div className="h-px w-full"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(251,146,60,0.7), transparent)' }} />
+              <div className="p-8 text-center">
+                <div className="font-mono-j text-[9px] text-amber-400/60 tracking-[0.3em] uppercase mb-4">
+                  FREE CREDITS EXHAUSTED
+                </div>
+                <h3 className="font-raj font-bold text-2xl mb-3 text-amber-400">
+                  {creditError.creditsUsed}/{creditError.creditsTotal} Intelligence Runs Used
+                </h3>
+                <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                  You've experienced ForgeOS at full power. To continue analyzing bugs for free, 
+                  add your own Gemini API key.
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <a href="/dashboard/setup" 
+                    className="px-8 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-sm text-[10px] tracking-[0.2em] uppercase transition-all shadow-lg shadow-amber-900/20">
+                    Configure API Key (Free)
+                  </a>
+                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer"
+                    className="px-8 py-3 border border-amber-500/30 hover:border-amber-500/60 text-amber-400 font-bold rounded-sm text-[10px] tracking-[0.2em] uppercase transition-all">
+                    Get Key from Google →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Results */}
         {result && (
+
           <div className="fade-up space-y-4">
 
             {/* Badges */}
