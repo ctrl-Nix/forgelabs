@@ -4,6 +4,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default function ProjectDetails() {
   const { id } = useParams()
   const router = useRouter()
@@ -23,7 +25,7 @@ export default function ProjectDetails() {
       setLoading(false)
     }
     fetchProject()
-  }, [id])
+  }, [id, router])
 
   if (loading) return (
     <main className="min-h-screen bg-[#050508] flex items-center justify-center">
@@ -52,7 +54,7 @@ export default function ProjectDetails() {
             ⚒ ForgeOS
           </Link>
           <div className="font-mono-j text-[10px] text-gray-500 tracking-widest uppercase">
-             VENTURE ID: {id?.toString().slice(0,8)}
+             PROJECT ID: {id?.toString().slice(0,8)}
           </div>
         </div>
       </nav>
@@ -61,7 +63,7 @@ export default function ProjectDetails() {
         <div className="mb-14">
            <div className="flex items-center gap-3 mb-5">
               <div className="w-6 h-px bg-blue-500/50" />
-              <span className="font-mono-j text-[10px] text-blue-500/60 tracking-[0.35em] uppercase">Venture Profile</span>
+              <span className="font-mono-j text-[10px] text-blue-500/60 tracking-[0.35em] uppercase">Project Profile</span>
            </div>
            <h1 className="font-raj font-bold text-5xl md:text-6xl tracking-tight leading-none mb-4">{project.name}</h1>
            <p className="max-w-2xl text-gray-500 font-mono-j text-xs leading-relaxed">{project.description}</p>
@@ -69,7 +71,7 @@ export default function ProjectDetails() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
            <div className="md:col-span-2">
-              <h2 className="font-raj font-bold text-2xl mb-8 tracking-wide uppercase">Launch Sequence</h2>
+              <h2 className="font-raj font-bold text-2xl mb-8 tracking-wide uppercase">Implementation Sequence</h2>
               <div className="space-y-4">
                  {steps.map((step, i) => (
                     <div key={step.id} className={`relative p-6 rounded-xl border ${step.status === 'waitlist' ? 'border-white/[0.02] bg-white/[0.01]' : 'border-white/[0.06] bg-white/[0.02] hover:border-blue-500/30'} transition-all group`}>
@@ -96,7 +98,7 @@ export default function ProjectDetails() {
 
            <div className="space-y-6">
               <div className="p-6 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                 <h3 className="font-raj font-bold text-lg mb-4 tracking-wide">Venture Status</h3>
+                 <h3 className="font-raj font-bold text-lg mb-4 tracking-wide">Project Status</h3>
                  <div className="space-y-4">
                     <div className="flex justify-between items-center">
                        <span className="font-mono-j text-[9px] text-gray-600 uppercase">Phase</span>
@@ -108,7 +110,7 @@ export default function ProjectDetails() {
                     </div>
                     <div className="h-px bg-white/[0.04]" />
                     <button className="w-full py-3 border border-white/10 rounded font-mono-j text-[9px] text-gray-500 hover:text-white hover:border-white/20 transition-all uppercase">
-                       Archive Venture
+                       Archive Project
                     </button>
                  </div>
               </div>

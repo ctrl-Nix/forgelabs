@@ -6,9 +6,14 @@ import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 import { supabase } from '../../lib/supabase'
 
-export default function MarketMind() {
+import { Suspense } from 'react'
+
+export const dynamic = 'force-dynamic'
+
+function MarketMindContent() {
   const searchParams = useSearchParams()
   const projectId = searchParams.get('projectId')
+
   
   const [idea, setIdea] = useState('')
   const [audience, setAudience] = useState('')
@@ -494,3 +499,11 @@ export default function MarketMind() {
     </main>
   )
 }
+
+export default function MarketMind() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#050508] flex items-center justify-center font-mono-j text-blue-500 text-[10px] tracking-[0.3em] uppercase">Initializing Sequence...</div>}>
+      <MarketMindContent />
+    </Suspense>
+  )
+}

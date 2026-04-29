@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default function HistoryPage() {
   const router = useRouter()
   const [activities, setActivities] = useState<any[]>([])
@@ -29,7 +31,7 @@ export default function HistoryPage() {
     }
 
     fetchActivities()
-  }, [])
+  }, [router])
 
   return (
     <main className="min-h-screen bg-[#050508] text-white">
@@ -43,7 +45,7 @@ export default function HistoryPage() {
       <nav className="relative z-20 border-b border-white/[0.04] px-8 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link href="/dashboard" className="font-raj font-bold text-lg tracking-[0.15em] text-white hover:text-blue-400 transition-colors duration-200 uppercase">
-            ⚒ ForgeLabs
+            ⚒ ForgeOS
           </Link>
           <Link href="/dashboard" className="font-mono-j text-[10px] text-gray-400 hover:text-white transition-colors duration-200 tracking-[0.15em] uppercase">
             ← Dashboard

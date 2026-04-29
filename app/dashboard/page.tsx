@@ -59,6 +59,8 @@ const tools = [
 ]
 
 
+export const dynamic = 'force-dynamic'
+
 export default function Dashboard() {
   const router = useRouter()
   const [checking, setChecking] = useState(true)
@@ -75,7 +77,8 @@ export default function Dashboard() {
         fetchProjects()
       }
     })
-  }, [])
+  }, [router])
+
 
   const fetchProjects = async () => {
     try {

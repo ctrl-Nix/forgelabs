@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
 
+export const dynamic = 'force-dynamic'
+
 export default function ZeroDayExplainer() {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
