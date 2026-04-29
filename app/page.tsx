@@ -194,7 +194,7 @@ export default function Home() {
 
         {/* Badge */}
         <div style={fadeUp(0.1)} className="mb-10">
-          <div className="inline-flex items-center gap-2.5 border border-white/[0.07] bg-white/[0.025] rounded-full px-4 py-1.5 text-[9px] text-white/28 tracking-[0.3em] uppercase font-medium">
+          <div className="inline-flex items-center gap-2.5 border border-white/[0.07] bg-white/[0.025] rounded-full px-4 py-1.5 text-xs text-white/28 tracking-[0.3em] uppercase font-medium">
             <span className="w-1 h-1 bg-emerald-400/60 rounded-full"
               style={{ boxShadow: '0 0 5px rgba(52,211,153,0.5)' }} />
             System Online · v1.0
@@ -238,7 +238,7 @@ export default function Home() {
         {/* Typewriter subtitle */}
         <div style={{ ...fadeUp(0.42), minHeight: '1.8rem' }} className="mt-5 mb-1 flex items-center justify-center gap-3">
           <div className="h-px w-8" style={{ background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
-          <p className="text-white/28 text-[10px] tracking-[0.32em] uppercase font-light font-mono">
+          <p className="text-white/28 text-xs tracking-[0.32em] uppercase font-light font-mono">
             {typed}
             {!isTypingDone && (
               <span style={{ animation: 'blink 0.65s step-end infinite' }}>▌</span>
@@ -256,7 +256,7 @@ export default function Home() {
         {/* CTAs */}
         <div className="flex gap-3 justify-center flex-wrap" style={fadeUp(0.68)}>
           <Link href="/login"
-            className="group px-8 py-3 bg-white text-[#050507] font-bold rounded-sm text-[10px] tracking-[0.22em] uppercase"
+            className="group px-8 py-3 bg-white text-[#050507] font-bold rounded-sm text-xs tracking-[0.22em] uppercase"
             style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
             onMouseEnter={e => {
               e.currentTarget.style.transform = 'translateY(-1px)'
@@ -274,7 +274,7 @@ export default function Home() {
             </span>
           </Link>
           <Link href="/dashboard"
-            className="px-8 py-3 border border-white/10 text-white/32 font-bold rounded-sm text-[10px] tracking-[0.22em] uppercase"
+            className="px-8 py-3 border border-white/10 text-white/32 font-bold rounded-sm text-xs tracking-[0.22em] uppercase"
             style={{ transition: 'all 0.2s ease', backdropFilter: 'blur(8px)' }}
             onMouseEnter={e => {
               e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'
@@ -303,7 +303,7 @@ export default function Home() {
                 <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-px h-4 bg-white/8" />
               )}
               <div className="text-lg font-black text-white/55 mb-1 tabular-nums tracking-tight">{stat.value}</div>
-              <div className="text-[8px] text-white/16 uppercase tracking-[0.35em]">{stat.label}</div>
+              <div className="text-xs text-white/16 uppercase tracking-[0.35em]">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -314,9 +314,9 @@ export default function Home() {
         <div className="h-px"
           style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.05) 30%, rgba(255,255,255,0.05) 70%, transparent)' }} />
         <div className="flex justify-between items-center px-8 py-4" style={fadeUp(1.0)}>
-          <span className="text-[8px] text-white/12 tracking-[0.3em] uppercase">Forge Labs</span>
-          <span className="text-[8px] text-white/10 tracking-[0.25em] uppercase">Research · Build · Ship · Repeat</span>
-          <span className="text-[8px] text-white/12 tracking-[0.3em] uppercase">© 2025</span>
+          <span className="text-xs text-white/12 tracking-[0.3em] uppercase">Forge Labs</span>
+          <span className="text-xs text-white/10 tracking-[0.25em] uppercase">Research · Build · Ship · Repeat</span>
+          <span className="text-xs text-white/12 tracking-[0.3em] uppercase">© 2025</span>
         </div>
       </div>
     </main>

@@ -29,10 +29,10 @@ export default function NewVenture() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050508] text-white flex flex-col items-center justify-center px-6">
+    <main className="min-h-screen bg-[var(--background)] text-slate-900 dark:text-foreground flex flex-col items-center justify-center px-6">
        <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-        .font-raj { font-family: 'Rajdhani', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        .font-raj { font-family: 'Inter', sans-serif; }
         .font-mono-j { font-family: 'JetBrains Mono', monospace; }
       `}</style>
 
@@ -46,30 +46,30 @@ export default function NewVenture() {
              </svg>
           </div>
           <h1 className="font-raj font-bold text-4xl tracking-tight mb-2">Initialize Venture</h1>
-          <p className="font-mono-j text-[10px] text-gray-500 tracking-widest uppercase">Phase 0: Inception Sequence</p>
+          <p className="font-mono-j text-xs text-slate-500 dark:text-gray-500 tracking-widest uppercase">Phase 0: Research Phase Sequence</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="font-mono-j text-[9px] text-gray-400 tracking-widest uppercase mb-2 block">Venture Name</label>
+            <label className="font-mono-j text-xs text-slate-500 dark:text-gray-400 tracking-widest uppercase mb-2 block">Venture Name</label>
             <input 
               required
               type="text" 
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded px-4 py-3 font-mono-j text-sm outline-none focus:border-blue-500/50 transition-all"
+              className="w-full bg-card shadow-sm dark:bg-white/3 border border-slate-200 dark:border-slate-200 dark:border-white/10 rounded px-4 py-3 font-mono-j text-sm outline-none focus:border-blue-500/50 transition-all"
               placeholder="e.g. Project Nova"
             />
           </div>
 
           <div>
-            <label className="font-mono-j text-[9px] text-gray-400 tracking-widest uppercase mb-2 block">Core Thesis / Description</label>
+            <label className="font-mono-j text-xs text-slate-500 dark:text-gray-400 tracking-widest uppercase mb-2 block">Core Thesis / Description</label>
             <textarea 
               required
               value={description}
               onChange={e => setDescription(e.target.value)}
               rows={4}
-              className="w-full bg-white/[0.03] border border-white/10 rounded px-4 py-3 font-mono-j text-sm outline-none focus:border-blue-500/50 transition-all resize-none"
+              className="w-full bg-card shadow-sm dark:bg-white/3 border border-slate-200 dark:border-slate-200 dark:border-white/10 rounded px-4 py-3 font-mono-j text-sm outline-none focus:border-blue-500/50 transition-all resize-none"
               placeholder="Briefly describe the market problem you're solving..."
             />
           </div>
@@ -77,11 +77,11 @@ export default function NewVenture() {
           <button 
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-sm text-[11px] tracking-[0.25em] uppercase transition-all shadow-lg shadow-blue-900/20">
+            className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-foreground font-bold rounded-sm text-[11px] tracking-wider uppercase transition-all shadow-lg shadow-blue-900/20">
             {loading ? 'INITIALIZING...' : 'BEGIN INCEPTION'}
           </button>
           
-          <Link href="/dashboard" className="block text-center font-mono-j text-[9px] text-gray-600 hover:text-gray-400 tracking-widest uppercase mt-4">
+          <Link href="/dashboard" className="block text-center font-mono-j text-xs text-slate-500 dark:text-gray-600 hover:text-slate-500 dark:text-gray-400 tracking-widest uppercase mt-4">
              Abort Sequence
           </Link>
         </form>

@@ -1,5 +1,9 @@
 'use client'
+import { ThemeToggle } from '@/app/components/ThemeToggle'
+import { motion, AnimatePresence } from 'framer-motion'
+import confetti from 'canvas-confetti'
 import { useState } from 'react'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,355 +13,161 @@ export default function ZeroDayExplainer() {
   const [language, setLanguage] = useState('JavaScript')
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-
+  const [progress, setProgress] = useState(0)
   const [creditError, setCreditError] = useState<any>(null)
 
   const handleSubmit = async () => {
+    if (!code) return
     setLoading(true)
     setResult(null)
     setCreditError(null)
-    const userKey = localStorage.getItem('FORGE_USER_API_KEY')
-    const res = await fetch('/api/zerodayexplainer', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-user-key': userKey || '' 
-      },
-      body: JSON.stringify({ code, error, language })
-    })
+    setProgress(0)
+    
+    // Simulated progress
+    const timer = setInterval(() => {
+        setProgress(p => (p < 90 ? p + 10 : p))
+    }, 400)
 
-    const data = await res.json()
-    if (res.status === 429 && data.needsKey) {
-      setCreditError(data)
+    try {
+      const userKey = localStorage.getItem('FORGE_USER_API_KEY')
+      const res = await fetch('/api/zerodayexplainer', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-key': userKey || '' 
+        },
+        body: JSON.stringify({ code, error, language })
+      })
+      const data = await res.json()
+      if (res.status === 429 && data.needsKey) {
+        setCreditError(data)
+        return
+      }
+      setResult(data)
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#10b981", "#34d399", "#ffffff"]
+      })
+    } catch (err) {
+      alert('Failed to analyze code')
+    } finally {
+      clearInterval(timer)
       setLoading(false)
-      return
     }
-    if (data.error) {
-      alert('Error: ' + data.error)
-      setLoading(false)
-      return
-    }
-    setResult(data)
-    setLoading(false)
-  }
-
-
-  const severityConfig: any = {
-    Critical: { color: '#f87171', rgb: '248,113,113' },
-    High: { color: '#fb923c', rgb: '251,146,60' },
-    Medium: { color: '#fbbf24', rgb: '251,191,36' },
-    Low: { color: '#34d399', rgb: '52,211,153' },
-  }
-
-  const confidenceConfig: any = {
-    High: { color: '#34d399', rgb: '52,211,153' },
-    Medium: { color: '#fbbf24', rgb: '251,191,36' },
-    Low: { color: '#f87171', rgb: '248,113,113' },
   }
 
   return (
-    <main className="min-h-screen bg-[#050508] text-white">
+    <main className="min-h-screen bg-background text-foreground">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-        .font-raj { font-family: 'Rajdhani', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        .font-raj { font-family: 'Inter', sans-serif; }
         .font-mono-j { font-family: 'JetBrains Mono', monospace; }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-up { animation: fadeUp 0.4s ease forwards; opacity: 0; }
-        @keyframes pulse-dot {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(0.8); }
-        }
-        textarea:-webkit-autofill {
-          -webkit-box-shadow: 0 0 0 100px #050508 inset !important;
-          -webkit-text-fill-color: white !important;
-        }
-        select option { background: #0a0a12; color: white; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 2px; }
       `}</style>
 
-      {/* Background grid */}
-      <div className="fixed inset-0 pointer-events-none" style={{
-        backgroundImage: 'linear-gradient(rgba(16,185,129,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.025) 1px, transparent 1px)',
-        backgroundSize: '48px 48px'
-      }} />
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[900px] h-[200px] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, rgba(16,185,129,0.04) 0%, transparent 70%)' }} />
-
-      {/* Navbar */}
-      <nav className="relative z-20 border-b border-white/[0.06] px-8 py-4">
+      <nav className="sticky top-0 z-50 glass-nav border-b border-slate-200 dark:border-white/10 px-8 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <a href="/dashboard" className="font-raj font-bold text-lg tracking-[0.15em] text-white hover:text-emerald-400 transition-colors duration-200 uppercase">
-            ⚒ ForgeLabs
-          </a>
-          <a href="/dashboard" className="font-mono-j text-[10px] text-gray-400 hover:text-white transition-colors duration-200 tracking-[0.15em] uppercase">
+          <div className="flex items-center gap-6">
+            <Link href="/dashboard" className="font-raj font-bold text-lg tracking-[0.15em] text-slate-900 dark:text-foreground hover:text-emerald-400 transition-colors duration-200 uppercase">
+              ⚒ ForgeLabs
+            </Link>
+            <ThemeToggle />
+          </div>
+          <Link href="/dashboard" className="font-mono-j text-xs text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:text-foreground transition-colors duration-200 tracking-[0.15em] uppercase flex items-center gap-2">
             ← Dashboard
-          </a>
+          </Link>
         </div>
       </nav>
 
       <div className="relative z-10 max-w-5xl mx-auto px-8 py-12">
-
-        {/* Header */}
-        <div className="mb-10 fade-up" style={{ animationDelay: '0.05s' }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-6 h-px bg-emerald-500/50" />
-            <span className="font-mono-j text-[10px] text-emerald-400/70 tracking-[0.35em] uppercase">Engineering Module</span>
+            <span className="font-mono-j text-xs text-emerald-400/70 tracking-widest uppercase">Engineering Module</span>
           </div>
           <div className="flex items-center gap-4 mb-3">
-            <div className="p-2.5 rounded-md"
-              style={{
-                background: 'rgba(16,185,129,0.12)',
-                border: '1px solid rgba(16,185,129,0.3)',
-                color: '#34d399',
-                boxShadow: '0 0 15px rgba(16,185,129,0.15)',
-              }}>
+            <div className="p-2.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <path d="M9 12l2 2 4-4"/>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
               </svg>
             </div>
             <h1 className="font-raj font-bold text-5xl tracking-tight">Zero-Day Explainer</h1>
           </div>
-          <p className="font-mono-j text-xs text-gray-400 tracking-wide">
-            Root cause analysis · Severity scoring · Fixed code · Prevention tips
-          </p>
+        </motion.div>
+
+        <div className="premium-card rounded-xl p-7 mb-8">
+          <p className="font-mono-j text-xs text-slate-500 tracking-widest uppercase mb-6">// CODE ANALYSIS INPUT</p>
+          <div className="space-y-4 mb-6">
+            <textarea
+              placeholder="Paste broken code here..."
+              value={code}
+              onChange={e => setCode(e.target.value)}
+              className="w-full h-48 px-4 py-3 text-sm text-foreground bg-secondary/50 border border-border outline-none transition-all duration-200 font-mono-j rounded-md focus:border-emerald-500/50"
+            />
+            <input
+              type="text"
+              placeholder="Error message (optional)..."
+              value={error}
+              onChange={e => setError(e.target.value)}
+              className="w-full px-4 py-3 text-sm text-foreground bg-secondary/50 border border-border outline-none transition-all duration-200 font-mono-j rounded-md focus:border-emerald-500/50"
+            />
+          </div>
+
+          {loading && (
+            <div className="mb-6">
+              <div className="h-1 w-full bg-emerald-500/10 rounded-full overflow-hidden">
+                <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} className="h-full bg-emerald-500" />
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !code}
+            className="premium-button w-full py-3.5 font-raj font-bold text-lg tracking-widest uppercase rounded-md bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/20"
+          >
+            {loading ? 'Analyzing Codebase...' : 'Execute Root Cause Analysis'}
+          </button>
         </div>
 
-        {/* Input Panel */}
-        <div className="fade-up mb-8" style={{ animationDelay: '0.1s' }}>
-          <div className="relative rounded-xl overflow-hidden"
-            style={{
-              border: '1px solid rgba(16,185,129,0.2)',
-              background: 'rgba(255,255,255,0.02)',
-              boxShadow: '0 0 40px rgba(16,185,129,0.04)',
-            }}>
-
-            <div className="h-px w-full"
-              style={{ background: 'linear-gradient(90deg, transparent, rgba(16,185,129,0.7), transparent)' }} />
-
-            <div className="absolute top-3 left-3 w-3 h-3"
-              style={{ borderTop: '1px solid rgba(16,185,129,0.5)', borderLeft: '1px solid rgba(16,185,129,0.5)' }} />
-            <div className="absolute bottom-3 right-3 w-3 h-3"
-              style={{ borderBottom: '1px solid rgba(16,185,129,0.5)', borderRight: '1px solid rgba(16,185,129,0.5)' }} />
-
-            <div className="p-7">
-              <p className="font-mono-j text-[9px] text-emerald-400/60 tracking-[0.3em] uppercase mb-6">// INPUT PARAMETERS</p>
-
-              {/* Language selector */}
-              <div className="mb-4">
-                <label className="font-mono-j text-[9px] text-gray-400 tracking-[0.25em] uppercase mb-2 block">
-                  LANGUAGE
-                </label>
-                <select
-                  value={language}
-                  onChange={e => setLanguage(e.target.value)}
-                  className="w-full px-4 py-3 text-sm text-white outline-none transition-all duration-200 font-mono-j rounded-md appearance-none"
-                  style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                  }}
-                  onFocus={e => (e.target as HTMLSelectElement).style.borderColor = 'rgba(16,185,129,0.6)'}
-                  onBlur={e => (e.target as HTMLSelectElement).style.borderColor = 'rgba(255,255,255,0.15)'}
-                >
-                  {['JavaScript', 'TypeScript', 'Python', 'Go', 'Rust', 'Java', 'C++', 'CSS'].map(l => (
-                    <option key={l} value={l}>{l}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Code input */}
-              <div className="mb-4">
-                <label className="font-mono-j text-[9px] text-gray-400 tracking-[0.25em] uppercase mb-2 block">
-                  BROKEN CODE
-                </label>
-                <textarea
-                  placeholder="Paste your broken code here..."
-                  value={code}
-                  onChange={e => setCode(e.target.value)}
-                  rows={8}
-                  className="w-full px-4 py-3 text-sm text-white outline-none transition-all duration-200 font-mono-j rounded-md resize-none"
-                  style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    color: '#e2e8f0',
-                  }}
-                  onFocus={e => e.target.style.borderColor = 'rgba(16,185,129,0.6)'}
-                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.15)'}
-                />
-              </div>
-
-              {/* Error input */}
-              <div className="mb-6">
-                <label className="font-mono-j text-[9px] text-gray-400 tracking-[0.25em] uppercase mb-2 block">
-                  ERROR MESSAGE <span className="text-gray-600 normal-case tracking-normal">(optional)</span>
-                </label>
-                <textarea
-                  placeholder="Paste the error message here..."
-                  value={error}
-                  onChange={e => setError(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-3 text-sm text-white outline-none transition-all duration-200 font-mono-j rounded-md resize-none"
-                  style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    color: '#e2e8f0',
-                  }}
-                  onFocus={e => e.target.style.borderColor = 'rgba(16,185,129,0.6)'}
-                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.15)'}
-                />
-              </div>
-
-              {loading && (
-                <div className="flex items-center gap-6 mb-5">
-                  {['Parsing code', 'Identifying root cause', 'Generating fix'].map((s, i) => (
-                    <div key={s} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"
-                        style={{ animation: `pulse-dot 1s ease ${i * 0.3}s infinite` }} />
-                      <span className="font-mono-j text-[9px] text-gray-400 tracking-[0.15em]">{s}</span>
+        <AnimatePresence>
+          {result && (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="premium-card rounded-xl p-7">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div>
+                      <p className="font-mono-j text-[10px] text-emerald-500 tracking-widest uppercase mb-3">ROOT CAUSE</p>
+                      <p className="text-slate-600 dark:text-gray-300 text-sm leading-relaxed">{result.analysis.root_cause}</p>
                     </div>
-                  ))}
-                </div>
-              )}
-
-              <button
-                onClick={handleSubmit}
-                disabled={loading || !code}
-                className="w-full py-3.5 font-raj font-bold text-lg tracking-widest uppercase transition-all duration-200 rounded-md"
-                style={{
-                  background: loading || !code ? 'rgba(16,185,129,0.3)' : 'rgba(16,185,129,1)',
-                  color: loading || !code ? 'rgba(255,255,255,0.5)' : 'white',
-                  cursor: loading || !code ? 'not-allowed' : 'pointer',
-                  boxShadow: !loading && code ? '0 0 20px rgba(16,185,129,0.25)' : 'none',
-                }}>
-                {loading ? 'Analyzing...' : 'Explain This Bug'}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Credit Exhausted Banner */}
-        {creditError && (
-          <div className="fade-up mb-8">
-            <div className="relative rounded-xl overflow-hidden"
-              style={{ border: '1px solid rgba(251,146,60,0.3)', background: 'rgba(251,146,60,0.05)' }}>
-              <div className="h-px w-full"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(251,146,60,0.7), transparent)' }} />
-              <div className="p-8 text-center">
-                <div className="font-mono-j text-[9px] text-amber-400/60 tracking-[0.3em] uppercase mb-4">
-                  FREE CREDITS EXHAUSTED
-                </div>
-                <h3 className="font-raj font-bold text-2xl mb-3 text-amber-400">
-                  {creditError.creditsUsed}/{creditError.creditsTotal} Intelligence Runs Used
-                </h3>
-                <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto leading-relaxed">
-                  You've experienced ForgeOS at full power. To continue analyzing bugs for free, 
-                  add your own Gemini API key.
-                </p>
-                <div className="flex gap-4 justify-center">
-                  <a href="/dashboard/setup" 
-                    className="px-8 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-sm text-[10px] tracking-[0.2em] uppercase transition-all shadow-lg shadow-amber-900/20">
-                    Configure API Key (Free)
-                  </a>
-                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer"
-                    className="px-8 py-3 border border-amber-500/30 hover:border-amber-500/60 text-amber-400 font-bold rounded-sm text-[10px] tracking-[0.2em] uppercase transition-all">
-                    Get Key from Google →
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Results */}
-        {result && (
-
-          <div className="fade-up space-y-4">
-
-            {/* Badges */}
-            <div className="flex gap-3">
-              {result.severity && severityConfig[result.severity] && (
-                <span className="font-mono-j text-[9px] px-3 py-1.5 rounded-md tracking-[0.15em]"
-                  style={{
-                    color: severityConfig[result.severity].color,
-                    background: `rgba(${severityConfig[result.severity].rgb},0.1)`,
-                    border: `1px solid rgba(${severityConfig[result.severity].rgb},0.25)`,
-                  }}>
-                  SEVERITY: {result.severity.toUpperCase()}
-                </span>
-              )}
-              {result.confidence && confidenceConfig[result.confidence] && (
-                <span className="font-mono-j text-[9px] px-3 py-1.5 rounded-md tracking-[0.15em]"
-                  style={{
-                    color: confidenceConfig[result.confidence].color,
-                    background: `rgba(${confidenceConfig[result.confidence].rgb},0.1)`,
-                    border: `1px solid rgba(${confidenceConfig[result.confidence].rgb},0.25)`,
-                  }}>
-                  CONFIDENCE: {result.confidence.toUpperCase()}
-                </span>
-              )}
-            </div>
-
-            {/* Root Cause */}
-            <div className="relative rounded-xl overflow-hidden"
-              style={{ border: '1px solid rgba(248,113,113,0.15)', background: 'rgba(248,113,113,0.03)' }}>
-              <div className="h-px w-full"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(248,113,113,0.5), transparent)' }} />
-              <div className="p-6">
-                <p className="font-mono-j text-[9px] text-red-400/60 tracking-[0.3em] uppercase mb-3">ROOT CAUSE</p>
-                <p className="text-gray-300 text-sm leading-relaxed">{result.root_cause}</p>
-              </div>
-            </div>
-
-            {/* Explanation */}
-            <div className="relative rounded-xl overflow-hidden"
-              style={{ border: '1px solid rgba(251,191,36,0.15)', background: 'rgba(251,191,36,0.03)' }}>
-              <div className="h-px w-full"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(251,191,36,0.5), transparent)' }} />
-              <div className="p-6">
-                <p className="font-mono-j text-[9px] text-yellow-400/60 tracking-[0.3em] uppercase mb-3">EXPLANATION</p>
-                <p className="text-gray-300 text-sm leading-relaxed">{result.explanation}</p>
-              </div>
-            </div>
-
-            {/* Fixed Code */}
-            <div className="relative rounded-xl overflow-hidden"
-              style={{ border: '1px solid rgba(52,211,153,0.15)', background: 'rgba(5,5,8,0.8)' }}>
-              <div className="h-px w-full"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(52,211,153,0.5), transparent)' }} />
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <p className="font-mono-j text-[9px] text-emerald-400/60 tracking-[0.3em] uppercase">FIXED CODE</p>
-                  <button
-                    onClick={() => navigator.clipboard.writeText(result.corrected_code)}
-                    className="font-mono-j text-[9px] text-gray-500 hover:text-white transition-colors tracking-[0.15em] px-3 py-1.5 rounded-md"
-                    style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}>
-                    COPY
-                  </button>
-                </div>
-                <pre className="text-emerald-300/90 text-xs font-mono-j overflow-x-auto leading-relaxed whitespace-pre-wrap">
-                  {result.corrected_code}
-                </pre>
-              </div>
-            </div>
-
-            {/* Prevention Tip */}
-            <div className="relative rounded-xl overflow-hidden"
-              style={{ border: '1px solid rgba(59,130,246,0.15)', background: 'rgba(59,130,246,0.03)' }}>
-              <div className="h-px w-full"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(59,130,246,0.5), transparent)' }} />
-              <div className="p-6">
-                <p className="font-mono-j text-[9px] text-blue-400/60 tracking-[0.3em] uppercase mb-3">PREVENTION TIP</p>
-                <p className="text-gray-300 text-sm leading-relaxed">{result.prevention_tip}</p>
-              </div>
-            </div>
-
-          </div>
-        )}
+                    <div className="section-boundary" />
+                    <div>
+                      <p className="font-mono-j text-[10px] text-emerald-500 tracking-widest uppercase mb-3">FIXED CODE</p>
+                      <pre className="p-4 rounded-lg bg-secondary/50 border border-border text-xs font-mono-j overflow-x-auto">
+                        <code>{result.fixed_code}</code>
+                      </pre>
+                    </div>
+                  </div>
+                  <div className="space-y-6">
+                    <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-center">
+                       <p className="font-mono-j text-[10px] text-emerald-500 mb-2 uppercase tracking-widest">Severity Score</p>
+                       <p className="font-raj font-bold text-5xl text-emerald-500">{result.analysis.severity_score}<span className="text-sm text-slate-500">/10</span></p>
+                    </div>
+                    <div>
+                      <p className="font-mono-j text-[10px] text-slate-500 tracking-widest uppercase mb-3">PREVENTION TIPS</p>
+                      <ul className="space-y-2">
+                        {result.prevention_tips.map((tip: string, i: number) => (
+                          <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-gray-300">
+                             <span className="text-emerald-500 mt-1 shrink-0">›</span>{tip}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   )

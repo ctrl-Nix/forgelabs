@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ThemeToggle } from '@/app/components/ThemeToggle'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -11,37 +12,6 @@ export default function LoginPage() {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-
-    const cols = Math.floor(canvas.width / 20)
-    const drops: number[] = Array(cols).fill(1)
-    const chars = '01アイウエオカキクケコABCDEFGHIJKLMN'
-
-    let animId: number
-    const draw = () => {
-      ctx.fillStyle = 'rgba(5,5,8,0.05)'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      ctx.fillStyle = 'rgba(59,130,246,0.15)'
-      ctx.font = '12px JetBrains Mono, monospace'
-      drops.forEach((y, i) => {
-        const char = chars[Math.floor(Math.random() * chars.length)]
-        ctx.fillText(char, i * 20, y * 20)
-        if (y * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0
-        drops[i]++
-      })
-      animId = requestAnimationFrame(draw)
-    }
-    draw()
-    return () => cancelAnimationFrame(animId)
-  }, [])
 
   const handleAuth = async () => {
     setLoading(true)
@@ -59,10 +29,10 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-[#050508] text-white flex items-center justify-center overflow-hidden">
+    <main className="relative min-h-screen bg-[var(--background)] text-foreground flex items-center justify-center overflow-hidden">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-        .font-raj { font-family: 'Rajdhani', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        .font-raj { font-family: 'Inter', sans-serif; }
         .font-mono-j { font-family: 'JetBrains Mono', monospace; }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(20px); }
@@ -70,37 +40,30 @@ export default function LoginPage() {
         }
         .fade-up { animation: fadeUp 0.5s ease forwards; }
         input:-webkit-autofill {
-          -webkit-box-shadow: 0 0 0 100px #050508 inset !important;
-          -webkit-text-fill-color: white !important;
+          -webkit-box-shadow: 0 0 0 100px var(--background) inset !important;
+          -webkit-text-fill-color: var(--foreground) !important;
         }
       `}</style>
-
-      {/* Matrix rain canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none opacity-40" />
 
       {/* Center glow */}
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
         <div className="w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%)' }} />
+           />
       </div>
-
-      {/* Grid */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{
-        backgroundImage: 'linear-gradient(rgba(59,130,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,1) 1px, transparent 1px)',
-        backgroundSize: '48px 48px'
-      }} />
 
       {/* Login card */}
       <div className="relative z-10 w-full max-w-md px-6 fade-up">
-        {/* Back link */}
-        <Link href="/" className="font-mono-j text-[10px] text-gray-600 hover:text-white transition-colors tracking-[0.2em] uppercase flex items-center gap-2 mb-8">
-          ← Back to Home
-        </Link>
+        <div className="flex items-center justify-between mb-8">
+          <Link href="/" className="font-mono-j text-xs text-slate-500 dark:text-gray-600 hover:text-slate-900 dark:text-foreground transition-colors tracking-wider uppercase flex items-center gap-2">
+            ← Back to Home
+          </Link>
+          <ThemeToggle />
+        </div>
 
         <div className="rounded-xl overflow-hidden"
           style={{
             border: '1px solid rgba(59,130,246,0.2)',
-            background: 'rgba(5,5,8,0.8)',
+            background: 'var(--background)',
             backdropFilter: 'blur(20px)',
             boxShadow: '0 0 40px rgba(59,130,246,0.08), 0 0 80px rgba(59,130,246,0.04), inset 0 1px 0 rgba(59,130,246,0.1)',
           }}>
@@ -109,7 +72,6 @@ export default function LoginPage() {
           <div className="h-px w-full"
             style={{ background: 'linear-gradient(90deg, transparent, rgba(59,130,246,0.8), transparent)' }} />
 
-          {/* Corner accents */}
           <div className="relative p-8">
             <div className="absolute top-4 left-4 w-3 h-3"
               style={{ borderTop: '1px solid rgba(59,130,246,0.5)', borderLeft: '1px solid rgba(59,130,246,0.5)' }} />
@@ -118,13 +80,13 @@ export default function LoginPage() {
 
             {/* Header */}
             <div className="text-center mb-8">
-              <p className="font-mono-j text-[10px] text-blue-500/50 tracking-[0.4em] uppercase mb-3">
+              <p className="font-mono-j text-xs text-blue-500/50 tracking-widest uppercase mb-3">
                 // SYSTEM ACCESS
               </p>
               <h1 className="font-raj font-bold text-4xl tracking-tight mb-1">
                 {isSignUp ? 'Create Account' : 'Welcome Back'}
               </h1>
-              <p className="font-mono-j text-xs text-gray-600 tracking-wide">
+              <p className="font-mono-j text-xs text-slate-500 dark:text-gray-600 tracking-wide">
                 {isSignUp ? 'Join ForgeLabs' : 'Sign in to your workspace'}
               </p>
             </div>
@@ -132,7 +94,7 @@ export default function LoginPage() {
             {/* Inputs */}
             <div className="space-y-4 mb-6">
               <div>
-                <label className="font-mono-j text-[9px] text-gray-600 tracking-[0.25em] uppercase mb-2 block">
+                <label className="font-mono-j text-xs text-slate-500 dark:text-gray-600 tracking-wider uppercase mb-2 block">
                   Email Address
                 </label>
                 <input
@@ -141,18 +103,17 @@ export default function LoginPage() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleAuth()}
-                  className="w-full px-4 py-3 text-sm text-white placeholder-gray-700 outline-none transition-all duration-200 font-mono-j"
+                  className="w-full px-4 py-3 text-sm text-foreground placeholder-gray-500 outline-none transition-all duration-200 font-mono-j rounded-md"
                   style={{
-                    background: 'rgba(255,255,255,0.03)',
+                    background: 'var(--card-bg)',
                     border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: '6px',
                   }}
                   onFocus={e => e.target.style.borderColor = 'rgba(59,130,246,0.5)'}
                   onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
                 />
               </div>
               <div>
-                <label className="font-mono-j text-[9px] text-gray-600 tracking-[0.25em] uppercase mb-2 block">
+                <label className="font-mono-j text-xs text-slate-500 dark:text-gray-600 tracking-wider uppercase mb-2 block">
                   Password
                 </label>
                 <input
@@ -161,11 +122,10 @@ export default function LoginPage() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleAuth()}
-                  className="w-full px-4 py-3 text-sm text-white placeholder-gray-700 outline-none transition-all duration-200 font-mono-j"
+                  className="w-full px-4 py-3 text-sm text-foreground placeholder-gray-500 outline-none transition-all duration-200 font-mono-j rounded-md"
                   style={{
-                    background: 'rgba(255,255,255,0.03)',
+                    background: 'var(--card-bg)',
                     border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: '6px',
                   }}
                   onFocus={e => e.target.style.borderColor = 'rgba(59,130,246,0.5)'}
                   onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
@@ -196,7 +156,7 @@ export default function LoginPage() {
                 background: loading || !email || !password
                   ? 'rgba(59,130,246,0.2)'
                   : 'rgba(59,130,246,1)',
-                color: loading || !email || !password ? 'rgba(255,255,255,0.3)' : 'white',
+                color: 'white',
                 cursor: loading || !email || !password ? 'not-allowed' : 'pointer',
                 boxShadow: !loading && email && password ? '0 0 20px rgba(59,130,246,0.3)' : 'none',
               }}>
@@ -204,11 +164,11 @@ export default function LoginPage() {
             </button>
 
             {/* Toggle */}
-            <p className="text-center font-mono-j text-xs text-gray-600 tracking-wide">
+            <p className="text-center font-mono-j text-xs text-slate-500 dark:text-gray-600 tracking-wide">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button
                 onClick={() => { setIsSignUp(!isSignUp); setMessage('') }}
-                className="text-blue-400 hover:text-blue-300 transition-colors">
+                className="text-blue-500 hover:text-blue-400 transition-colors">
                 {isSignUp ? 'Sign In' : 'Sign Up'}
               </button>
             </p>

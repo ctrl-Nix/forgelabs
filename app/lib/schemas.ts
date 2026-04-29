@@ -5,7 +5,7 @@ export const ProjectSchema = z.object({
   description: z.string().min(5),
 })
 
-export const MarketMindSchema = z.object({
+export const ForgeInsightSchema = z.object({
   projectId: z.string().uuid().optional(),
   idea: z.string().min(3),
   audience: z.string().min(3),

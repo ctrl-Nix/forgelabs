@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { MarketMindSchema } from '@/app/lib/schemas'
+import { ForgeInsightSchema } from '@/app/lib/schemas'
 import { supabase } from '@/app/lib/supabase'
 import { checkCredits } from '@/app/lib/credits'
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const validated = MarketMindSchema.safeParse(body)
+    const validated = ForgeInsightSchema.safeParse(body)
     
     if (!validated.success) {
       return NextResponse.json({ error: 'Invalid input', details: validated.error.format() }, { status: 400 })
@@ -125,7 +125,7 @@ Return exactly this JSON:
     try {
       await supabase.from('tool_usage').insert({
         user_id: userId || 'anonymous',
-        tool_id: 'marketmind',
+        tool_id: 'forgeinsight',
         project_id: projectId || null,
         key_source: credits.usingServerCredits ? 'server' : 'user',
         data: { 
@@ -149,7 +149,7 @@ Return exactly this JSON:
     })
 
   } catch (err: any) {
-    console.error('MarketMind error:', err.message)
+    console.error('ForgeInsight error:', err.message)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
