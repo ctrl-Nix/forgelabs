@@ -30,16 +30,24 @@ function ForgeInsightContent() {
   const [creditError, setCreditError] = useState<any>(null)
 
   useEffect(() => {
-    if (projectId) {
-      supabase.from('projects').select('*').eq('id', projectId).single()
-        .then(({ data, error }) => {
-          if (error) console.error('Failed to load project:', error.message)
-          if (data) {
-            setIdea(data.name)
-            setAudience(data.description ? data.description.slice(0, 50) + '...' : '')
-          }
-        })
+    async function loadProject() {
+      if (!projectId) return
+      
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', projectId)
+        .single()
+        
+      if (error) {
+        console.error('Failed to load project:', error.message)
+      } else if (data) {
+        setIdea(data.name)
+        setAudience(data.description ? data.description.slice(0, 50) + '...' : '')
+      }
     }
+    
+    loadProject()
   }, [projectId])
 
   const handleSubmit = async () => {
