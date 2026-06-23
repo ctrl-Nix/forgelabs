@@ -10,13 +10,13 @@ const tools = [
   {
     id: 'forgeinsight',
     name: 'ForgeInsight',
-    description: 'Input a SaaS idea. Get competitor analysis, market gaps, target personas, and a full MoSCoW PRD in under 30 seconds.',
+    description: 'Input a SaaS idea. Get competitor analysis, market gaps, target personas, and a full MoSCoW PRD — then a 30-day launch plan. Fully autonomous 3-step pipeline.',
     category: 'Product Research',
     status: 'live',
     href: '/tools/forgeinsight',
     accent: '#3b82f6',
     accentRgb: '59,130,246',
-    tag: '2-STEP AI PIPELINE',
+    tag: '3-STEP AI PIPELINE',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M12 2L2 7l10 5 10-5-10-5z"/>
@@ -26,15 +26,33 @@ const tools = [
     ),
   },
   {
+    id: 'challengeidea',
+    name: 'Challenge My Idea',
+    description: 'The honest critic no AI is willing to be. Find fatal flaws, real competitor threats, and get a blunt verdict — Build it, Pivot first, or Kill it — before you waste months.',
+    category: 'Validation',
+    status: 'live',
+    href: '/tools/challengeidea',
+    accent: '#ef4444',
+    accentRgb: '239,68,68',
+    tag: 'CONTRARIAN AGENT',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/>
+        <path d="M12 8V12"/>
+        <path d="M12 16H12.01"/>
+      </svg>
+    ),
+  },
+  {
     id: 'zerodayexplainer',
     name: 'Zero-Day Explainer',
-    description: 'Paste broken code and an error message. Get root cause analysis, severity scoring, fixed code, and prevention tips.',
+    description: 'Paste broken code. Get root cause analysis and a fix — then the fix is automatically verified and edge-case tested. 3 autonomous steps, zero clicking.',
     category: 'Engineering',
     status: 'live',
     href: '/tools/zerodayexplainer',
     accent: '#10b981',
     accentRgb: '16,185,129',
-    tag: '8 LANGUAGES',
+    tag: 'ITERATIVE PIPELINE',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -59,6 +77,7 @@ const tools = [
     ),
   },
 ]
+
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<any[]>([])
@@ -188,14 +207,14 @@ export default function Dashboard() {
                 transition={{ delay: 0.3 + i * 0.1 }}
                 whileHover={{ y: -5 }}
               >
-                <Link href={tool.href} className="premium-card group relative p-6 rounded-lg block">
+                <Link href={tool.href} className="premium-card group relative p-6 rounded-lg block" style={{ ['--tool-accent' as any]: tool.accent }}>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="text-blue-500">{tool.icon}</div>
+                    <div style={{ color: tool.accent }}>{tool.icon}</div>
                     <span className="font-mono-j text-xs text-slate-500 tracking-widest uppercase">{tool.tag}</span>
                   </div>
                   <h3 className="font-raj font-bold text-lg mb-2">{tool.name}</h3>
                   <p className="text-slate-500 text-xs mb-4 line-clamp-2">{tool.description}</p>
-                  <div className="font-mono-j text-[10px] text-blue-500/50 group-hover:text-blue-500 transition-colors tracking-widest uppercase font-bold">Launch Intelligence →</div>
+                  <div className="font-mono-j text-[10px] transition-colors tracking-widest uppercase font-bold" style={{ color: `rgba(${tool.accentRgb},0.5)` }}>Launch Intelligence →</div>
                 </Link>
               </motion.div>
             ))}
@@ -274,7 +293,7 @@ function RecentActivities() {
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 rounded-full bg-blue-500" />
               <div>
-                <div className="text-xs font-mono-j text-foreground uppercase tracking-wider">{act.tool_id.replace('forgeinsight', 'ForgeInsight').replace('zerodayexplainer', 'Zero-Day Explainer')}</div>
+                <div className="text-xs font-mono-j text-foreground uppercase tracking-wider">{act.tool_id.replace('forgeinsight', 'ForgeInsight').replace('zerodayexplainer', 'Zero-Day Explainer').replace('challengeidea', 'Challenge My Idea')}</div>
                 <div className="text-[10px] text-slate-500 font-mono-j uppercase">{new Date(act.timestamp).toLocaleString()}</div>
               </div>
             </div>
