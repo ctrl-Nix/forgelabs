@@ -32,7 +32,8 @@ function ForgeInsightContent() {
   useEffect(() => {
     if (projectId) {
       supabase.from('projects').select('*').eq('id', projectId).single()
-        .then(({ data }) => {
+        .then(({ data, error }) => {
+          if (error) console.error('Failed to load project:', error.message)
           if (data) {
             setIdea(data.name)
             setAudience(data.description ? data.description.slice(0, 50) + '...' : '')
