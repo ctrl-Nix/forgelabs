@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { supabase } from '@/app/lib/supabase'
 
 export default function NewVenture() {
   const router = useRouter()
@@ -13,9 +14,14 @@ export default function NewVenture() {
     e.preventDefault()
     setLoading(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const accessToken = session?.access_token || ''
       const res = await fetch('/api/projects', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
+        },
         body: JSON.stringify({ name, description })
       })
       const data = await res.json()

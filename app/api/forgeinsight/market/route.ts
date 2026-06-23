@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ForgeInsightSchema } from '@/app/lib/schemas'
+import { z } from 'zod'
 import { supabase } from '@/app/lib/supabase'
 import { checkCredits } from '@/app/lib/credits'
+
+const MarketSchema = z.object({
+  idea: z.string().min(1, 'Idea is required'),
+  audience: z.string().min(1, 'Audience is required'),
+  monetization: z.string().min(1, 'Monetization is required'),
+  projectId: z.string().optional().nullable(),
+})
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const validated = ForgeInsightSchema.safeParse(body)
+    const validated = MarketSchema.safeParse(body)
     
     if (!validated.success) {
       return NextResponse.json({ error: 'Invalid input', details: validated.error.format() }, { status: 400 })
@@ -14,11 +21,14 @@ export async function POST(req: NextRequest) {
 
     const { idea, audience, monetization, projectId } = validated.data
 
-    // ─── CREDIT GATE ───────────────────────────────────────────
-    // This is the freemium engine. It determines WHO pays for this call.
     const userKey = req.headers.get('x-user-key')
-    const { data: { session } } = await supabase.auth.getSession()
-    const userId = session?.user?.id
+    const authHeader = req.headers.get('Authorization')
+    const accessToken = authHeader?.replace('Bearer ', '') ?? ''
+    let userId: string | undefined
+    if (accessToken) {
+      const { data: { user } } = await supabase.auth.getUser(accessToken)
+      userId = user?.id
+    }
 
     const credits = await checkCredits(userId, userKey)
 
@@ -31,14 +41,12 @@ export async function POST(req: NextRequest) {
       }, { status: 429 })
     }
 
-    // Determine which key to actually use for the Gemini call
     const apiKey = credits.hasOwnKey ? userKey! : process.env.GEMINI_API_KEY
 
     if (!apiKey) {
       return NextResponse.json({ error: 'Gemini API key is not configured' }, { status: 500 })
     }
 
-    // ─── STEP 1: Market Research ──────────────────────────────
     const step1Prompt = `You are a senior SaaS product strategist. Return structured JSON only. No extra text. No markdown.
 
 Analyze this SaaS idea: ${idea}
@@ -78,50 +86,7 @@ Return exactly this JSON:
     const step1Text = step1Data.candidates[0].content.parts[0].text
     const step1JSON = JSON.parse(step1Text)
 
-    // ─── STEP 2: PRD Generation ──────────────────────────────
-    const step2Prompt = `You are a senior product manager writing a concise PRD. Return JSON only. No extra text. No markdown.
-
-Based on this market research: ${JSON.stringify(step1JSON)}
-
-Return exactly this JSON:
-{
-  "moscow": {
-    "must_have": ["string"],
-    "should_have": ["string"],
-    "could_have": ["string"],
-    "wont_have": ["string"]
-  },
-  "mvp_scope": "string",
-  "monetization_strategy": "string",
-  "launch_plan_30_days": ["string"],
-  "tech_complexity_score": 5
-}`
-
-    const step2Res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: step2Prompt }] }],
-          generationConfig: { 
-            temperature: 0.3,
-            responseMimeType: "application/json"
-          }
-        })
-      }
-    )
-
-    if (!step2Res.ok) {
-      const errData = await step2Res.json()
-      throw new Error(`Gemini Step 2 failed: ${errData.error?.message || step2Res.statusText}`)
-    }
-
-    const step2Data = await step2Res.json()
-    const step2Text = step2Data.candidates[0].content.parts[0].text
-    const step2JSON = JSON.parse(step2Text)
-
-    // ─── LOG USAGE (with credit tracking) ─────────────────────
+    // Log usage only in the first step of the pipeline to count as 1 credit
     try {
       await supabase.from('tool_usage').insert({
         user_id: userId || 'anonymous',
@@ -130,7 +95,7 @@ Return exactly this JSON:
         key_source: credits.usingServerCredits ? 'server' : 'user',
         data: { 
           input: { idea, audience, monetization },
-          output: { research: step1JSON, prd: step2JSON }
+          output: { research: step1JSON }
         },
         timestamp: new Date().toISOString()
       })
@@ -140,7 +105,6 @@ Return exactly this JSON:
 
     return NextResponse.json({ 
       research: step1JSON, 
-      prd: step2JSON,
       _credits: {
         used: credits.freeCreditsUsed + (credits.usingServerCredits ? 1 : 0),
         total: credits.freeCreditsTotal,
@@ -149,7 +113,7 @@ Return exactly this JSON:
     })
 
   } catch (err: any) {
-    console.error('ForgeInsight error:', err.message)
+    console.error('ForgeInsight Market error:', err.message)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }

@@ -4,12 +4,17 @@ import { FREEMIUM_CONFIG } from '@/app/lib/credits'
 
 export async function GET(req: NextRequest) {
   try {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+    const authHeader = req.headers.get('Authorization')
+    const accessToken = authHeader?.replace('Bearer ', '') ?? ''
+    if (!accessToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const { data: { user } } = await supabase.auth.getUser(accessToken)
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const userId = session.user.id
+    const userId = user.id
 
     // Count lifetime server-funded runs
     const { count: serverRuns } = await supabase

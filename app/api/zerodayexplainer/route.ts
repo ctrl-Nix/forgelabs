@@ -16,8 +16,13 @@ export async function POST(req: NextRequest) {
 
     // ─── CREDIT GATE ───────────────────────────────────────────
     const userKey = req.headers.get('x-user-key')
-    const { data: { session } } = await supabase.auth.getSession()
-    const userId = session?.user?.id
+    const authHeader = req.headers.get('Authorization')
+    const accessToken = authHeader?.replace('Bearer ', '') ?? ''
+    let userId: string | undefined
+    if (accessToken) {
+      const { data: { user } } = await supabase.auth.getUser(accessToken)
+      userId = user?.id
+    }
 
     const credits = await checkCredits(userId, userKey)
 

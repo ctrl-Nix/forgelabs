@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import { useState } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/app/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,11 +31,14 @@ export default function ZeroDayExplainer() {
 
     try {
       const userKey = localStorage.getItem('FORGE_USER_API_KEY')
+      const { data: { session } } = await supabase.auth.getSession()
+      const accessToken = session?.access_token || ''
       const res = await fetch('/api/zerodayexplainer', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'x-user-key': userKey || '' 
+          'x-user-key': userKey || '',
+          ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
         },
         body: JSON.stringify({ code, error, language })
       })
@@ -136,34 +140,33 @@ export default function ZeroDayExplainer() {
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="premium-card rounded-xl p-7">
                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-6">
-                    <div>
-                      <p className="font-mono-j text-[10px] text-emerald-500 tracking-widest uppercase mb-3">ROOT CAUSE</p>
-                      <p className="text-slate-600 dark:text-gray-300 text-sm leading-relaxed">{result.analysis.root_cause}</p>
-                    </div>
-                    <div className="section-boundary" />
-                    <div>
-                      <p className="font-mono-j text-[10px] text-emerald-500 tracking-widest uppercase mb-3">FIXED CODE</p>
-                      <pre className="p-4 rounded-lg bg-secondary/50 border border-border text-xs font-mono-j overflow-x-auto">
-                        <code>{result.fixed_code}</code>
-                      </pre>
-                    </div>
-                  </div>
-                  <div className="space-y-6">
-                    <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-center">
-                       <p className="font-mono-j text-[10px] text-emerald-500 mb-2 uppercase tracking-widest">Severity Score</p>
-                       <p className="font-raj font-bold text-5xl text-emerald-500">{result.analysis.severity_score}<span className="text-sm text-slate-500">/10</span></p>
-                    </div>
-                    <div>
-                      <p className="font-mono-j text-[10px] text-slate-500 tracking-widest uppercase mb-3">PREVENTION TIPS</p>
-                      <ul className="space-y-2">
-                        {result.prevention_tips.map((tip: string, i: number) => (
-                          <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-gray-300">
-                             <span className="text-emerald-500 mt-1 shrink-0">›</span>{tip}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                     <div>
+                       <p className="font-mono-j text-[10px] text-emerald-500 tracking-widest uppercase mb-3">ROOT CAUSE</p>
+                       <p className="text-slate-600 dark:text-gray-300 text-sm leading-relaxed">{result.root_cause}</p>
+                     </div>
+                     <div className="section-boundary" />
+                     <div>
+                       <p className="font-mono-j text-[10px] text-emerald-500 tracking-widest uppercase mb-3">EXPLANATION</p>
+                       <p className="text-slate-600 dark:text-gray-300 text-sm leading-relaxed">{result.explanation}</p>
+                     </div>
+                     <div className="section-boundary" />
+                     <div>
+                       <p className="font-mono-j text-[10px] text-emerald-500 tracking-widest uppercase mb-3">FIXED CODE</p>
+                       <pre className="p-4 rounded-lg bg-secondary/50 border border-border text-xs font-mono-j overflow-x-auto">
+                         <code>{result.corrected_code}</code>
+                       </pre>
+                     </div>
+                   </div>
+                   <div className="space-y-6">
+                     <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-center">
+                        <p className="font-mono-j text-[10px] text-emerald-500 mb-2 uppercase tracking-widest">Severity</p>
+                        <p className="font-raj font-bold text-5xl text-emerald-500">{result.severity}</p>
+                     </div>
+                     <div>
+                       <p className="font-mono-j text-[10px] text-slate-500 tracking-widest uppercase mb-3">PREVENTION TIP</p>
+                       <p className="text-xs text-slate-600 dark:text-gray-300">{result.prevention_tip}</p>
+                     </div>
+                   </div>
                </div>
             </motion.div>
           )}
