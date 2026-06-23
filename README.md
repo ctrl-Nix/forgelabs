@@ -1,6 +1,6 @@
-# ⚒ ForgeLabs — Premium AI Intelligence Platform
+# ⚒ ForgeLabs — Modular AI Product Engineering Suite
 
-> **The Professional AI Engineering Suite** — A high-performance platform for modular AI research, automated documentation, and code intelligence.
+> An agentic platform for product research, validation, and code intelligence. Each tool runs as an autonomous multi-step pipeline — no tab-switching, no manual chaining.
 
 **GitHub:** [github.com/ctrl-Nix/forgelabs](https://github.com/ctrl-Nix/forgelabs)
 
@@ -8,89 +8,103 @@
 
 ## What is ForgeLabs?
 
-ForgeLabs is a sophisticated **AI Intelligence & Orchestration Platform** designed for the modern engineer. It transforms raw AI power into structured, actionable insights through specialized modules, validated schemas, and a "Project-First" workflow.
+ForgeLabs is a modular AI orchestration platform built for engineers and indie founders. It connects specialized AI agents into autonomous pipelines — you provide the input once, and each tool chains its outputs through multiple reasoning steps to deliver structured, actionable results.
 
-Built with **Next.js 16**, **Tailwind CSS 4**, and **Framer Motion**, ForgeLabs offers a premium, gamified experience that feels fluid and professional.
-
----
-
-## ✨ Key Features
-
-### 🌗 Premium Light & Dark Mode
-Experience a highly polished "Ultra-Clean" design. ForgeLabs defaults to a sophisticated **Slate-tinted Light Theme** for daytime productivity and offers a deep, high-contrast **Dark Mode** for nighttime engineering.
-
-### 🎮 Gamified Experience
-Intelligence shouldn't be boring. ForgeLabs includes:
-- **Smooth Transitions**: Staggered card entrances and layout shifts powered by Framer Motion.
-- **Success Feedback**: Professional confetti bursts upon completing research or analysis.
-- **Progress Tracking**: Real-time animated progress bars for AI intelligence processing.
-
-### 📂 Project-Centric Workflow
-Organize your work logically. Group all research reports, code fixes, and system logs under specific **Projects** to maintain a clean audit trail.
+Built with **Next.js 16**, **Vanilla CSS**, and **Framer Motion**. Uses **Gemini 2.5 Flash** with a BYOK (Bring Your Own Key) model for privacy and cost control.
 
 ---
 
-## 🛠 Active Modules
+## Active Modules
 
 ### 1. ForgeInsight — Product Research Pipeline
-**Advanced Market Analysis & Documentation**
-Input a SaaS idea and get a full-spectrum research report in seconds.
-- **Market Summary**: AI-generated competitive landscape analysis.
-- **MoSCoW PRD**: Automated feature prioritization (Must-haves, Should-haves, etc.).
-- **30-Day Launch Plan**: A step-by-step roadmap to go from idea to MVP.
-- **Export Ready**: Download beautiful PDF reports instantly.
+**3-step autonomous pipeline: Market Analysis → MoSCoW PRD → 30-Day Launch Plan**
 
-### 2. Zero-Day Explainer — Code Intelligence
-**Technical Root Cause Analysis**
-Paste broken code and error logs to receive an engineering-grade breakdown.
-- **Fixed Code**: Immediate, validated resolutions across 8+ languages.
-- **Severity Scoring**: Dynamic 1-10 scoring based on security and performance impact.
-- **Prevention Tips**: Structured advice to ensure the same bug never returns.
+Input a SaaS idea once. The pipeline runs all three steps automatically, passing output from each step as context into the next.
 
----
+- **Step 1 — Market Analysis**: Competitive landscape, market gaps, target personas, and risk assessment.
+- **Step 2 — MoSCoW PRD**: Feature prioritization derived directly from the market analysis. Must-have, Should-have, Could-have, Won't-have.
+- **Step 3 — Launch Plan**: A 30-day go-to-market roadmap built from the PRD.
 
-## ⚙️ Resource Management (BYOK)
+### 2. Challenge My Idea — Contrarian Validation Agent
+**The honest critic no other AI tool is willing to be.**
 
-ForgeLabs follows a **Bring Your Own Key (BYOK)** model for privacy and scalability:
-- **Free Trial**: Every user receives **shared intelligence runs** to experience the platform.
-- **Unlimited Usage**: Connect your own **Gemini API Key** (Free from Google AI Studio) in the `Config AI` section for unlimited power.
-- **Privacy First**: Your API keys are stored only in your browser's local storage—never on our servers.
+Uses a system prompt specifically engineered to find holes — not to encourage. Returns fatal flaws (with severity), real competitor threats, pivot suggestions, and a blunt verdict: **Build it / Pivot first / Kill it**.
+
+### 3. Zero-Day Explainer — Iterative Debug Pipeline
+**3-step autonomous pipeline: Root Cause → Verify Fix → Edge Cases**
+
+Paste broken code and an error message. The pipeline identifies the root cause and generates a fix (Step 1), re-analyzes the corrected code to confirm the fix is valid (Step 2), then performs edge-case analysis and issues a production-readiness verdict (Step 3).
 
 ---
 
-## 🏗 Tech Stack
-- **Framework**: Next.js 16 (App Router + Turbopack)
-- **Styling**: Tailwind CSS 4 + Framer Motion
-- **Database**: Supabase (PostgreSQL + Auth)
-- **AI Models**: Google Gemini 2.0 Flash / Pro
+## Architecture
+
+Each tool follows the same pattern:
+
+```
+User Input
+    │
+    ▼
+Step 1: Primary Analysis (Gemini 2.5 Flash)
+    │  output passed as context
+    ▼
+Step 2: Secondary Reasoning
+    │  output passed as context
+    ▼
+Step 3: Verification / Synthesis
+    │
+    ▼
+Structured JSON → Rendered UI
+```
+
+All API routes validate input with **Zod**, authenticate via Supabase JWT (`getUser(token)` — not `getSession()`), and log usage to a `tool_usage` table for audit trails.
 
 ---
 
-## 🚀 Setup & Installation
+## Tech Stack
 
-1. **Clone & Install**
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Styling | Vanilla CSS + Framer Motion |
+| Database + Auth | Supabase (PostgreSQL + JWT) |
+| AI Model | Google Gemini 2.5 Flash |
+| Validation | Zod |
+| Deployment | Vercel |
+
+---
+
+## Resource Management (BYOK)
+
+- **Free tier**: 3 shared pipeline runs per user, tracked server-side.
+- **Unlimited**: Add your own Gemini API key in the Config section. Keys are stored in `localStorage` — never sent to our servers except as a passthrough header to Google's API.
+
+---
+
+## Setup
+
+1. **Clone & install**
 ```bash
 git clone https://github.com/ctrl-Nix/forgelabs
 cd forgelabs
 npm install
 ```
 
-2. **Environment Configuration**
-Create a `.env.local` file with your Supabase credentials:
+2. **Environment**
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
 GEMINI_API_KEY=your_shared_fallback_key
 ```
 
-3. **Database Migration**
-Run the SQL found in `lib/schema.sql` (or see manual setup in wiki) to initialize the `projects` and `tool_usage` tables.
+3. **Database**
+Run the SQL in `lib/schema.sql` to initialize `projects` and `tool_usage` tables.
 
-4. **Launch**
+4. **Dev server**
 ```bash
 npm run dev
 ```
 
 ---
 
-*Engineered for those who build the future.*
+*Built to be honest about what it does.*

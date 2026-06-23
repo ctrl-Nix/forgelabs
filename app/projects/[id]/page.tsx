@@ -35,9 +35,10 @@ export default function ProjectDetails() {
   )
 
   const steps = [
-    { id: 'forgeinsight', label: 'Research Phase', desc: 'Market research & PRD', status: 'ready', href: `/tools/forgeinsight?projectId=${id}` },
-    { id: 'zeroday', label: 'Engineering', desc: 'Bug analysis & fix', status: 'ready', href: `/tools/zerodayexplainer?projectId=${id}` },
-    { id: 'engage', label: 'Growth', desc: 'User retention engine', status: 'waitlist', href: '#' },
+    { id: 'forgeinsight', label: 'ForgeInsight', desc: 'Market research, PRD & launch plan', status: 'ready', href: `/tools/forgeinsight?projectId=${id}` },
+    { id: 'challengeidea', label: 'Challenge My Idea', desc: 'Contrarian validation & risk analysis', status: 'ready', href: `/tools/challengeidea` },
+    { id: 'zeroday', label: 'Zero-Day Explainer', desc: 'Bug analysis, fix & verification', status: 'ready', href: `/tools/zerodayexplainer?projectId=${id}` },
+    { id: 'engage', label: 'EngageOS', desc: 'User retention engine', status: 'waitlist', href: '#' },
   ]
 
   return (
@@ -53,7 +54,7 @@ export default function ProjectDetails() {
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/dashboard" className="font-raj font-bold text-lg tracking-[0.15em] text-slate-900 dark:text-foreground hover:text-blue-400 transition-colors uppercase">
-              ⚒ ForgeOS
+              ⚒ ForgeLabs
             </Link>
             <ThemeToggle />
           </div>
@@ -75,7 +76,7 @@ export default function ProjectDetails() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
            <div className="md:col-span-2">
-              <h2 className="font-raj font-bold text-2xl mb-8 tracking-wide uppercase">Implementation Sequence</h2>
+              <h2 className="font-raj font-bold text-2xl mb-8 tracking-wide uppercase">Available Tools</h2>
               <div className="space-y-4">
                  {steps.map((step, i) => (
                     <div key={step.id} className={`premium-card p-6 rounded-xl`}>
@@ -109,7 +110,7 @@ export default function ProjectDetails() {
                        <span className="font-mono-j text-xs text-emerald-400 uppercase">{project.status}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                       <span className="font-mono-j text-xs text-slate-500 dark:text-gray-600 uppercase">Intelligence Runs</span>
+                        <span className="font-mono-j text-xs text-slate-500 dark:text-gray-600 uppercase">Pipeline Runs</span>
                        <span className="font-mono-j text-xs text-slate-900 dark:text-foreground">04</span>
                     </div>
                     <div className="h-px bg-white/[0.04]" />

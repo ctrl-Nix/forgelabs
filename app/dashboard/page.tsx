@@ -154,7 +154,7 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center gap-3 mb-5">
               <div className="w-6 h-px bg-blue-500/50" />
-              <span className="font-mono-j text-xs text-slate-500 dark:text-gray-400 tracking-widest uppercase">Project Control</span>
+              <span className="font-mono-j text-xs text-slate-500 dark:text-gray-400 tracking-widest uppercase">Your Projects</span>
             </div>
             <h1 className="font-raj font-bold text-5xl md:text-6xl tracking-tight leading-none">
               Your Projects
@@ -176,7 +176,7 @@ export default function Dashboard() {
               <div className="col-span-full py-20 text-center border border-dashed border-border rounded-xl bg-secondary/10">
                  <p className="font-mono-j text-xs text-slate-500 tracking-widest uppercase mb-4">No active projects found.</p>
                  <Link href="/dashboard/new" className="text-blue-400 font-mono-j text-xs tracking-widest uppercase hover:text-blue-300">
-                    Begin Initial Sequence →
+                 Create your first project →
                  </Link>
               </div>
             ) : (
@@ -214,7 +214,7 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-raj font-bold text-lg mb-2">{tool.name}</h3>
                   <p className="text-slate-500 text-xs mb-4 line-clamp-2">{tool.description}</p>
-                  <div className="font-mono-j text-[10px] transition-colors tracking-widest uppercase font-bold" style={{ color: `rgba(${tool.accentRgb},0.5)` }}>Launch Intelligence →</div>
+                  <div className="font-mono-j text-[10px] transition-colors tracking-widest uppercase font-bold" style={{ color: `rgba(${tool.accentRgb},0.5)` }}>Open tool →</div>
                 </Link>
               </motion.div>
             ))}
@@ -246,7 +246,7 @@ function ProjectCard({ project, index }: { project: any, index: number }) {
          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
       </div>
       <div className="mb-6">
-        <div className="font-mono-j text-[10px] text-slate-400 tracking-widest uppercase mb-2">PHASE: {project.status?.toUpperCase() || 'INCEPTION'}</div>
+        <div className="font-mono-j text-[10px] text-slate-400 tracking-widest uppercase mb-2">STATUS: {project.status?.toUpperCase() || 'ACTIVE'}</div>
         <h3 className="font-raj font-bold text-2xl text-foreground group-hover:text-blue-500 transition-colors">{project.name}</h3>
       </div>
       <p className="text-slate-500 text-xs mb-8 line-clamp-2 font-mono-j">{project.description}</p>
@@ -254,7 +254,7 @@ function ProjectCard({ project, index }: { project: any, index: number }) {
          <div className="flex -space-x-2">
             {[1,2,3].map(i => <div key={i} className="w-6 h-6 rounded-full border-2 border-background bg-secondary/50" />)}
          </div>
-         <span className="font-mono-j text-[10px] text-slate-400 group-hover:text-blue-500 transition-colors uppercase tracking-widest font-bold">Enter Control →</span>
+         <span className="font-mono-j text-[10px] text-slate-400 group-hover:text-blue-500 transition-colors uppercase tracking-widest font-bold">Open project →</span>
       </div>
     </Link>
   )

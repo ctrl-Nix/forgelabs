@@ -51,13 +51,13 @@ export default function NewVenture() {
                 <path d="M2 12l10 5 10-5"/>
              </svg>
           </div>
-          <h1 className="font-raj font-bold text-4xl tracking-tight mb-2">Initialize Venture</h1>
-          <p className="font-mono-j text-xs text-slate-500 dark:text-gray-500 tracking-widest uppercase">Phase 0: Research Phase Sequence</p>
+          <h1 className="font-raj font-bold text-4xl tracking-tight mb-2">New Project</h1>
+          <p className="font-mono-j text-xs text-slate-500 dark:text-gray-500 tracking-widest uppercase">Organize your research and pipeline runs</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="font-mono-j text-xs text-slate-500 dark:text-gray-400 tracking-widest uppercase mb-2 block">Venture Name</label>
+            <label className="font-mono-j text-xs text-slate-500 dark:text-gray-400 tracking-widest uppercase mb-2 block">Project Name</label>
             <input 
               required
               type="text" 
@@ -69,7 +69,7 @@ export default function NewVenture() {
           </div>
 
           <div>
-            <label className="font-mono-j text-xs text-slate-500 dark:text-gray-400 tracking-widest uppercase mb-2 block">Core Thesis / Description</label>
+            <label className="font-mono-j text-xs text-slate-500 dark:text-gray-400 tracking-widest uppercase mb-2 block">Description</label>
             <textarea 
               required
               value={description}
@@ -84,11 +84,11 @@ export default function NewVenture() {
             type="submit"
             disabled={loading}
             className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-foreground font-bold rounded-sm text-[11px] tracking-wider uppercase transition-all shadow-lg shadow-blue-900/20">
-            {loading ? 'INITIALIZING...' : 'BEGIN INCEPTION'}
+            {loading ? 'CREATING...' : 'CREATE PROJECT'}
           </button>
           
           <Link href="/dashboard" className="block text-center font-mono-j text-xs text-slate-500 dark:text-gray-600 hover:text-slate-500 dark:text-gray-400 tracking-widest uppercase mt-4">
-             Abort Sequence
+             Cancel
           </Link>
         </form>
       </div>

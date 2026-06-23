@@ -294,8 +294,8 @@ export default function Home() {
         {/* Stats */}
         <div className="flex gap-16 justify-center mt-16" style={fadeUp(0.84)}>
           {[
-            { value: '2', label: 'AI Tools' },
-            { value: '2-Step', label: 'Pipeline' },
+            { value: '3', label: 'AI Tools' },
+            { value: '3-Step', label: 'Pipelines' },
             { value: '∞', label: 'Scale' },
           ].map((stat, i) => (
             <div key={stat.label} className="text-center relative">

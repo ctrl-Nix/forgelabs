@@ -54,10 +54,10 @@ export default function SetupGuide() {
       <nav className="border-b border-slate-200 dark:border-white/5 px-8 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link href="/dashboard" className="font-raj font-bold text-lg tracking-widest text-slate-900 dark:text-foreground hover:text-blue-400 transition-colors uppercase">
-            ⚒ ForgeOS
+            ⚒ ForgeLabs
           </Link>
           <Link href="/dashboard" className="font-mono-j text-xs text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:text-foreground transition-colors uppercase tracking-widest">
-            ← Back to Control
+            ← Dashboard
           </Link>
         </div>
       </nav>
@@ -68,17 +68,17 @@ export default function SetupGuide() {
             <div className="w-6 h-px bg-blue-500/50" />
             <span className="font-mono-j text-xs text-slate-500 dark:text-gray-400 tracking-widest uppercase">System Configuration</span>
           </div>
-          <h1 className="font-raj font-bold text-5xl mb-4 tracking-tight">Intelligence Engine</h1>
+          <h1 className="font-raj font-bold text-5xl mb-4 tracking-tight">API Configuration</h1>
           <p className="text-slate-500 dark:text-gray-500 font-mono-j text-xs leading-relaxed max-w-2xl">
-            This project provides <strong className="text-slate-900 dark:text-foreground">3 initial intelligence runs</strong> on shared infrastructure.
-            For unlimited usage, please provide your own Gemini API key.
+            This platform provides <strong className="text-slate-900 dark:text-foreground">3 free pipeline runs</strong> on shared infrastructure.
+            For unlimited usage, add your own Gemini API key.
           </p>
         </div>
 
         {/* Credit Status Panel */}
         <div className="fade-up mb-12 grid grid-cols-1 md:grid-cols-3 gap-4" style={{ animationDelay: '0.1s' }}>
           <div className="p-6 rounded-xl border border-slate-300 dark:border-white/6 bg-white/[0.02]">
-            <div className="font-mono-j text-xs text-slate-500 dark:text-gray-500 tracking-widest uppercase mb-3">Initial Runs</div>
+            <div className="font-mono-j text-xs text-slate-500 dark:text-gray-500 tracking-widest uppercase mb-3">Free Runs Remaining</div>
             <div className="flex items-end gap-2">
               <span className="font-raj font-bold text-4xl text-blue-400">
                 {credits ? credits.freeCredits.remaining : '—'}
@@ -160,7 +160,7 @@ export default function SetupGuide() {
           {/* Configuration */}
           <div className="space-y-6">
             <div className="p-8 rounded-xl border border-slate-300 dark:border-white/6 bg-white/[0.02]">
-              <h3 className="font-raj font-bold text-xl mb-6 uppercase tracking-wide">Injection Port</h3>
+              <h3 className="font-raj font-bold text-xl mb-6 uppercase tracking-wide">Your API Key</h3>
               <div className="space-y-6">
                 <div>
                   <label className="font-mono-j text-xs text-slate-500 dark:text-gray-500 uppercase tracking-widest mb-2 block">Gemini API Key</label>
