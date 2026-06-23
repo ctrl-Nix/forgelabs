@@ -57,11 +57,16 @@ function ForgeInsightContent() {
     
     try {
       const userKey = localStorage.getItem('FORGE_USER_API_KEY')
+      const anthropicKey = localStorage.getItem('FORGE_ANTHROPIC_KEY')
+      const openAiKey = localStorage.getItem('FORGE_OPENAI_KEY')
+      
       const { data: { session } } = await supabase.auth.getSession()
       const accessToken = session?.access_token || ''
       const headers: Record<string, string> = { 
         'Content-Type': 'application/json',
         'x-user-key': userKey || '',
+        'x-anthropic-key': anthropicKey || '',
+        'x-openai-key': openAiKey || '',
         ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
       }
 

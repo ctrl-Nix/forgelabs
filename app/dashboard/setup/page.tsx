@@ -5,13 +5,20 @@ import { ThemeToggle } from '@/app/components/ThemeToggle'
 
 export default function SetupGuide() {
   const [apiKey, setApiKey] = useState('')
+  const [anthropicKey, setAnthropicKey] = useState('')
+  const [openAiKey, setOpenAiKey] = useState('')
   const [saved, setSaved] = useState(false)
   const [showKey, setShowKey] = useState(false)
   const [credits, setCredits] = useState<any>(null)
 
   useEffect(() => {
-    const stored = localStorage.getItem('FORGE_USER_API_KEY')
-    if (stored) setApiKey(stored)
+    const storedGemini = localStorage.getItem('FORGE_USER_API_KEY')
+    const storedAnthropic = localStorage.getItem('FORGE_ANTHROPIC_KEY')
+    const storedOpenAi = localStorage.getItem('FORGE_OPENAI_KEY')
+    
+    if (storedGemini) setApiKey(storedGemini)
+    if (storedAnthropic) setAnthropicKey(storedAnthropic)
+    if (storedOpenAi) setOpenAiKey(storedOpenAi)
 
     fetch('/api/credits')
       .then(r => r.json())
@@ -20,18 +27,26 @@ export default function SetupGuide() {
   }, [])
 
   const saveKey = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem('FORGE_USER_API_KEY', apiKey.trim())
-    } else {
-      localStorage.removeItem('FORGE_USER_API_KEY')
-    }
+    if (apiKey.trim()) localStorage.setItem('FORGE_USER_API_KEY', apiKey.trim())
+    else localStorage.removeItem('FORGE_USER_API_KEY')
+    
+    if (anthropicKey.trim()) localStorage.setItem('FORGE_ANTHROPIC_KEY', anthropicKey.trim())
+    else localStorage.removeItem('FORGE_ANTHROPIC_KEY')
+    
+    if (openAiKey.trim()) localStorage.setItem('FORGE_OPENAI_KEY', openAiKey.trim())
+    else localStorage.removeItem('FORGE_OPENAI_KEY')
+
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }
 
   const clearKey = () => {
     localStorage.removeItem('FORGE_USER_API_KEY')
+    localStorage.removeItem('FORGE_ANTHROPIC_KEY')
+    localStorage.removeItem('FORGE_OPENAI_KEY')
     setApiKey('')
+    setAnthropicKey('')
+    setOpenAiKey('')
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }
@@ -163,8 +178,8 @@ export default function SetupGuide() {
               <h3 className="font-raj font-bold text-xl mb-6 uppercase tracking-wide">Your API Key</h3>
               <div className="space-y-6">
                 <div>
-                  <label className="font-mono-j text-xs text-slate-500 dark:text-gray-500 uppercase tracking-widest mb-2 block">Gemini API Key</label>
-                  <div className="relative">
+                  <label className="font-mono-j text-xs text-slate-500 dark:text-gray-500 uppercase tracking-widest mb-2 block">Gemini API Key (Fast Analysis)</label>
+                  <div className="relative mb-4">
                     <input 
                       type={showKey ? 'text' : 'password'}
                       value={apiKey}
@@ -172,11 +187,28 @@ export default function SetupGuide() {
                       placeholder="AIzaSy..."
                       className="w-full bg-card shadow-sm dark:bg-white/3 border border-slate-200 dark:border-slate-200 dark:border-white/10 rounded px-4 py-3 font-mono-j text-xs outline-none focus:border-blue-500/50 transition-all pr-16"
                     />
-                    <button 
-                      onClick={() => setShowKey(!showKey)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 font-mono-j text-xs text-slate-500 dark:text-gray-600 hover:text-slate-900 dark:text-foreground transition-colors uppercase tracking-widest">
-                      {showKey ? 'Hide' : 'Show'}
-                    </button>
+                  </div>
+                  
+                  <label className="font-mono-j text-xs text-slate-500 dark:text-gray-500 uppercase tracking-widest mb-2 block">Anthropic API Key (Claude - Deep Reasoning)</label>
+                  <div className="relative mb-4">
+                    <input 
+                      type={showKey ? 'text' : 'password'}
+                      value={anthropicKey}
+                      onChange={e => setAnthropicKey(e.target.value)}
+                      placeholder="sk-ant-..."
+                      className="w-full bg-card shadow-sm dark:bg-white/3 border border-slate-200 dark:border-slate-200 dark:border-white/10 rounded px-4 py-3 font-mono-j text-xs outline-none focus:border-blue-500/50 transition-all pr-16"
+                    />
+                  </div>
+
+                  <label className="font-mono-j text-xs text-slate-500 dark:text-gray-500 uppercase tracking-widest mb-2 block">OpenAI API Key (GPT - Structuring)</label>
+                  <div className="relative mb-4">
+                    <input 
+                      type={showKey ? 'text' : 'password'}
+                      value={openAiKey}
+                      onChange={e => setOpenAiKey(e.target.value)}
+                      placeholder="sk-proj-..."
+                      className="w-full bg-card shadow-sm dark:bg-white/3 border border-slate-200 dark:border-slate-200 dark:border-white/10 rounded px-4 py-3 font-mono-j text-xs outline-none focus:border-blue-500/50 transition-all pr-16"
+                    />
                   </div>
                 </div>
                 <button 
